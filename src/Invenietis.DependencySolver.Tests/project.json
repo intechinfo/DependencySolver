@@ -1,0 +1,32 @@
+{
+  "version": "0.0.0-Absolutely-Invalid",
+  "description": "Invenietis.DependencySolver.Tests Console Application",
+  "authors": [ "Antoine" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "scripts": {
+    "prebuild": "sgv prebuild"
+  },
+
+  "dependencies": {
+    "Invenietis.DependencySolver": "0.0.0-Absolutely-Invalid",
+    "Invenietis.DependencySolver.Abstractions.Tests": "0.0.0-Absolutely-Invalid",
+    "Invenietis.DependencySolver.Core": "0.0.0-Absolutely-Invalid",
+    "NUnitLite": "3.0.1"
+  },
+
+  "commands": {
+    "test": "Invenietis.DependencySolver.Tests"
+  },
+
+  "frameworks": {
+    "dnx451": { },
+    "dnx46": { }
+  }
+}

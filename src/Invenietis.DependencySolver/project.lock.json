@@ -1,0 +1,299 @@
+{
+  "locked": false,
+  "version": 2,
+  "targets": {
+    ".NETFramework,Version=v4.5.1": {
+      "Invenietis.DependencySolver.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "SimpleGitVersion.Core": "0.12.1"
+        }
+      },
+      "Invenietis.DependencySolver.Util/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1"
+      },
+      "LibGit2Sharp/0.21.0.176": {
+        "type": "package",
+        "compile": {
+          "lib/net40/LibGit2Sharp.dll": {}
+        },
+        "runtime": {
+          "lib/net40/LibGit2Sharp.dll": {}
+        }
+      },
+      "SimpleGitVersion.Core/0.12.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/SimpleGitVersion.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/SimpleGitVersion.Core.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6": {
+      "Invenietis.DependencySolver.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "SimpleGitVersion.Core": "0.12.1"
+        }
+      },
+      "Invenietis.DependencySolver.Util/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6"
+      },
+      "LibGit2Sharp/0.21.0.176": {
+        "type": "package",
+        "compile": {
+          "lib/net40/LibGit2Sharp.dll": {}
+        },
+        "runtime": {
+          "lib/net40/LibGit2Sharp.dll": {}
+        }
+      },
+      "SimpleGitVersion.Core/0.12.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/SimpleGitVersion.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/SimpleGitVersion.Core.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.5.1/win7-x86": {
+      "Invenietis.DependencySolver.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "SimpleGitVersion.Core": "0.12.1"
+        }
+      },
+      "Invenietis.DependencySolver.Util/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1"
+      },
+      "LibGit2Sharp/0.21.0.176": {
+        "type": "package",
+        "compile": {
+          "lib/net40/LibGit2Sharp.dll": {}
+        },
+        "runtime": {
+          "lib/net40/LibGit2Sharp.dll": {}
+        }
+      },
+      "SimpleGitVersion.Core/0.12.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/SimpleGitVersion.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/SimpleGitVersion.Core.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.5.1/win7-x64": {
+      "Invenietis.DependencySolver.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "SimpleGitVersion.Core": "0.12.1"
+        }
+      },
+      "Invenietis.DependencySolver.Util/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1"
+      },
+      "LibGit2Sharp/0.21.0.176": {
+        "type": "package",
+        "compile": {
+          "lib/net40/LibGit2Sharp.dll": {}
+        },
+        "runtime": {
+          "lib/net40/LibGit2Sharp.dll": {}
+        }
+      },
+      "SimpleGitVersion.Core/0.12.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/SimpleGitVersion.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/SimpleGitVersion.Core.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6/win7-x86": {
+      "Invenietis.DependencySolver.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "SimpleGitVersion.Core": "0.12.1"
+        }
+      },
+      "Invenietis.DependencySolver.Util/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6"
+      },
+      "LibGit2Sharp/0.21.0.176": {
+        "type": "package",
+        "compile": {
+          "lib/net40/LibGit2Sharp.dll": {}
+        },
+        "runtime": {
+          "lib/net40/LibGit2Sharp.dll": {}
+        }
+      },
+      "SimpleGitVersion.Core/0.12.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/SimpleGitVersion.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/SimpleGitVersion.Core.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6/win7-x64": {
+      "Invenietis.DependencySolver.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "SimpleGitVersion.Core": "0.12.1"
+        }
+      },
+      "Invenietis.DependencySolver.Util/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6"
+      },
+      "LibGit2Sharp/0.21.0.176": {
+        "type": "package",
+        "compile": {
+          "lib/net40/LibGit2Sharp.dll": {}
+        },
+        "runtime": {
+          "lib/net40/LibGit2Sharp.dll": {}
+        }
+      },
+      "SimpleGitVersion.Core/0.12.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/SimpleGitVersion.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/SimpleGitVersion.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Invenietis.DependencySolver.Abstractions/0.0.0-Absolutely-Invalid": {
+      "type": "project",
+      "path": "../Invenietis.DependencySolver.Abstractions/project.json"
+    },
+    "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
+      "type": "project",
+      "path": "../Invenietis.DependencySolver.Core.Abstractions/project.json"
+    },
+    "Invenietis.DependencySolver.Util/0.0.0-Absolutely-Invalid": {
+      "type": "project",
+      "path": "../Invenietis.DependencySolver.Util/project.json"
+    },
+    "LibGit2Sharp/0.21.0.176": {
+      "type": "package",
+      "sha512": "BiHTA0u/PkC89VkjpPhJm9YGHCK5x2dmWhXxW8Dekb2nLEZUlSYsnXMjyrT+iAcIRX8AcQqrKa+o8306guvcXA==",
+      "files": [
+        "App_Readme/libgit2.license.txt",
+        "App_Readme/LibGit2Sharp.CHANGES.md",
+        "App_Readme/LibGit2Sharp.LICENSE.md",
+        "App_Readme/LibGit2Sharp.README.md",
+        "build/net40/LibGit2Sharp.props",
+        "lib/net40/LibGit2Sharp.dll",
+        "lib/net40/LibGit2Sharp.xml",
+        "lib/net40/NativeBinaries/amd64/git2-e0902fb.dll",
+        "lib/net40/NativeBinaries/amd64/git2-e0902fb.pdb",
+        "lib/net40/NativeBinaries/x86/git2-e0902fb.dll",
+        "lib/net40/NativeBinaries/x86/git2-e0902fb.pdb",
+        "LibGit2Sharp.0.21.0.176.nupkg",
+        "LibGit2Sharp.0.21.0.176.nupkg.sha512",
+        "LibGit2Sharp.nuspec"
+      ]
+    },
+    "SimpleGitVersion.Core/0.12.1": {
+      "type": "package",
+      "sha512": "Y+cEvh2V36M7pNPQR7DFHRQNV2+RwR7nFz4gV195LkLMuaMfWH3WiPqjECEW1w7SOfUfyzO1DUi2xClz3O2kzQ==",
+      "files": [
+        "Build/SimpleGitVersion.Core.props",
+        "lib/net45/SimpleGitVersion.Core.dll",
+        "lib/net45/SimpleGitVersion.Core.pdb",
+        "lib/net45/SimpleGitVersion.Core.xml",
+        "NativeBinaries/amd64/git2-e0902fb.dll",
+        "NativeBinaries/x86/git2-e0902fb.dll",
+        "RepositoryInfo.xsd",
+        "SimpleGitVersion.Core.0.12.1.nupkg",
+        "SimpleGitVersion.Core.0.12.1.nupkg.sha512",
+        "SimpleGitVersion.Core.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "": [
+      "Invenietis.DependencySolver.Util >= 0.0.0-Absolutely-Invalid",
+      "Invenietis.DependencySolver.Abstractions >= 0.0.0-Absolutely-Invalid",
+      "LibGit2Sharp >= 0.21.0.176"
+    ],
+    ".NETFramework,Version=v4.5.1": [
+      "fx/System.Xml.Linq >= 4.0.0",
+      "fx/System.Xml >= 4.0.0"
+    ],
+    ".NETFramework,Version=v4.6": [
+      "fx/System.Xml.Linq >= 4.0.0",
+      "fx/System.Xml >= 4.0.0"
+    ]
+  }
+}
