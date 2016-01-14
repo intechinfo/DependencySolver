@@ -9,7 +9,7 @@ namespace Invenietis.DependencySolver.Core.Abstractions.Tests
     public abstract class ProjectTestsBase
     {
         [Test]
-        public void CreateNugetPackage_WithValidInputs_ShouldCreateANewNugetPackage()
+        public void CreateDependency_WithValidInputs_ShouldCreateANewDependency()
         {
             string solutionVersion = "v0.0.0";
             IGitRepository repo = CreateGitRepository( @"C:\TestRepo\" );
@@ -18,20 +18,20 @@ namespace Invenietis.DependencySolver.Core.Abstractions.Tests
             ISolution solution = repoVersion.CreateSolution( "TestSolution.sln" );
             IProject sut = solution.CreateProject( "P1.csproj" );
 
-            IProjectDependency package1 = sut.CreateNugetPackage( "Package1", "1.2.3" );
-            IProjectDependency package2 = sut.CreateNugetPackage( "Package2", "3.2.1" );
+            IProjectDependency dependency1 = sut.CreateDependency( "Package1", "1.2.3" );
+            IProjectDependency dependency2 = sut.CreateDependency( "Package2", "3.2.1" );
 
-            Assert.That( sut.Packages, Is.EquivalentTo( new[] { package1, package2 } ) );
-            Assert.That( package1.Projects, Is.EquivalentTo( new[] { sut } ) );
-            Assert.That( package2.Projects, Is.EquivalentTo( new[] { sut } ) );
-            Assert.That( package1.Name, Is.EqualTo( "Package1" ) );
-            Assert.That( package2.Name, Is.EqualTo( "Package2" ) );
-            Assert.That( package1.Version, Is.EqualTo( "1.2.3" ) );
-            Assert.That( package2.Version, Is.EqualTo( "3.2.1" ) );
+            Assert.That( sut.Dependencies, Is.EquivalentTo( new[] { dependency1, dependency2 } ) );
+            Assert.That( dependency1.Projects, Is.EquivalentTo( new[] { sut } ) );
+            Assert.That( dependency2.Projects, Is.EquivalentTo( new[] { sut } ) );
+            Assert.That( dependency1.Name, Is.EqualTo( "Package1" ) );
+            Assert.That( dependency2.Name, Is.EqualTo( "Package2" ) );
+            Assert.That( dependency1.Version, Is.EqualTo( "1.2.3" ) );
+            Assert.That( dependency2.Version, Is.EqualTo( "3.2.1" ) );
         }
 
         [Test]
-        public void AddNugetPackage_WithAnExistingPackage_ShouldAddThisPackage()
+        public void AddDependency_WithAnExistingDependency_ShouldAddThisDependency()
         {
             string solutionVersion = "v0.0.0";
             IGitRepository repo = CreateGitRepository( @"C:\TestRepo\" );
@@ -40,19 +40,19 @@ namespace Invenietis.DependencySolver.Core.Abstractions.Tests
             ISolution solution = repoVersion.CreateSolution( "TestSolution.sln" );
             IProject sut = solution.CreateProject( "P1.csproj" );
             IProject project = solution.CreateProject( "P2.csproj" );
-            IProjectDependency package1 = sut.CreateNugetPackage( "Package1", "1.2.3" );
-            IProjectDependency package2 = sut.CreateNugetPackage( "Package2", "3.2.1" );
-            IProjectDependency package3 = project.CreateNugetPackage( "Package3", "2.0.0" );
-            IProjectDependency package4 = project.CreateNugetPackage( "Package4", "1.0.0" );
+            IProjectDependency dependency1 = sut.CreateDependency( "Package1", "1.2.3" );
+            IProjectDependency dependency2 = sut.CreateDependency( "Package2", "3.2.1" );
+            IProjectDependency dependency3 = project.CreateDependency( "Package3", "2.0.0" );
+            IProjectDependency dependency4 = project.CreateDependency( "Package4", "1.0.0" );
 
-            sut.AddNugetPackage( package3 );
+            sut.AddDependency( dependency3 );
 
-            Assert.That( sut.Packages, Is.EquivalentTo( new[] { package1, package2, package3 } ) );
-            Assert.That( package3.Projects, Is.EquivalentTo( new[] { project, sut } ) );
+            Assert.That( sut.Dependencies, Is.EquivalentTo( new[] { dependency1, dependency2, dependency3 } ) );
+            Assert.That( dependency3.Projects, Is.EquivalentTo( new[] { project, sut } ) );
         }
 
         [Test]
-        public void CreateNugetPackage_WithInvalidInputs_ShouldThrowArgumentException()
+        public void CreateDependency_WithInvalidInputs_ShouldThrowArgumentException()
         {
             string solutionVersion = "v0.0.0";
             IGitRepository repo = CreateGitRepository( @"C:\TestRepo\" );
@@ -61,16 +61,16 @@ namespace Invenietis.DependencySolver.Core.Abstractions.Tests
             ISolution solution = repoVersion.CreateSolution( "TestSolution.sln" );
             IProject sut = solution.CreateProject( "P1.csproj" );
 
-            Assert.Throws<ArgumentException>( () => sut.CreateNugetPackage( string.Empty, "1.2.3" ) );
-            Assert.Throws<ArgumentException>( () => sut.CreateNugetPackage( null, "1.2.3" ) );
-            Assert.Throws<ArgumentException>( () => sut.CreateNugetPackage( " ", "1.2.3" ) );
-            Assert.Throws<ArgumentException>( () => sut.CreateNugetPackage( "TestPackage", string.Empty ) );
-            Assert.Throws<ArgumentException>( () => sut.CreateNugetPackage( "TestPackage", null ) );
-            Assert.Throws<ArgumentException>( () => sut.CreateNugetPackage( "TestPackage", " " ) );
+            Assert.Throws<ArgumentException>( () => sut.CreateDependency( string.Empty, "1.2.3" ) );
+            Assert.Throws<ArgumentException>( () => sut.CreateDependency( null, "1.2.3" ) );
+            Assert.Throws<ArgumentException>( () => sut.CreateDependency( " ", "1.2.3" ) );
+            Assert.Throws<ArgumentException>( () => sut.CreateDependency( "TestPackage", string.Empty ) );
+            Assert.Throws<ArgumentException>( () => sut.CreateDependency( "TestPackage", null ) );
+            Assert.Throws<ArgumentException>( () => sut.CreateDependency( "TestPackage", " " ) );
         }
 
         [Test]
-        public void AddNugetPackage_WithPackageBelongsToAnotherContext_ShouldThrowArgumentException()
+        public void AddDependency_WithDependencyBelongsToAnotherContext_ShouldThrowArgumentException()
         {
             string solutionVersion = "v0.0.0";
             ReleaseTagVersion releaseTagVersion = ReleaseTagVersion.TryParse( solutionVersion );
@@ -78,18 +78,18 @@ namespace Invenietis.DependencySolver.Core.Abstractions.Tests
             IGitRepositoryVersion repoVersion1 = repo1.CreateVersion( releaseTagVersion );
             ISolution solution1 = repoVersion1.CreateSolution( "TestSolution.sln" );
             IProject project = solution1.CreateProject( "P1.csproj" );
-            IProjectDependency package = project.CreateNugetPackage( "TestPackage", "1.0.0" );
+            IProjectDependency dependency = project.CreateDependency( "TestPackage", "1.0.0" );
 
             IGitRepository repo2 = CreateGitRepository( @"C:\TestRepo\" );
             IGitRepositoryVersion repoVersion2 = repo2.CreateVersion( releaseTagVersion );
             ISolution solution2 = repoVersion2.CreateSolution( "TestSolution.sln" );
             IProject sut = solution2.CreateProject( "P1.csproj" );
 
-            Assert.Throws<ArgumentException>( () => sut.AddNugetPackage( package ) );
+            Assert.Throws<ArgumentException>( () => sut.AddDependency( dependency ) );
         }
 
         [Test]
-        public void AddNugetPackage_WithNullPackage_ShouldThrowArgumentNullException()
+        public void AddDependency_WithNullDependency_ShouldThrowArgumentNullException()
         {
             string solutionVersion = "v0.0.0";
             IGitRepository repo = CreateGitRepository( @"C:\TestRepo\" );
@@ -98,11 +98,11 @@ namespace Invenietis.DependencySolver.Core.Abstractions.Tests
             ISolution solution = repoVersion.CreateSolution( "TestSolution.sln" );
             IProject sut = solution.CreateProject( "P1.csproj" );
 
-            Assert.Throws<ArgumentNullException>( () => sut.AddNugetPackage( null ) );
+            Assert.Throws<ArgumentNullException>( () => sut.AddDependency( null ) );
         }
 
         [Test]
-        public void AddNugetPackage_WithUnknownPackage_ShouldThrowArgumentNullException()
+        public void AddDependency_WithUnknownDependency_ShouldThrowArgumentNullException()
         {
             string solutionVersion = "v0.0.0";
             IGitRepository repo = CreateGitRepository( @"C:\TestRepo\" );
@@ -110,9 +110,9 @@ namespace Invenietis.DependencySolver.Core.Abstractions.Tests
             IGitRepositoryVersion repoVersion = repo.CreateVersion( releaseTagVersion );
             ISolution solution = repoVersion.CreateSolution( "TestSolution.sln" );
             IProject sut = solution.CreateProject( "P1.csproj" );
-            IProjectDependency package = Substitute.For<IProjectDependency>();
+            IProjectDependency dependency = Substitute.For<IProjectDependency>();
 
-            Assert.Throws<ArgumentException>( () => sut.AddNugetPackage( package ) );
+            Assert.Throws<ArgumentException>( () => sut.AddDependency( dependency ) );
         }
 
         [Test]

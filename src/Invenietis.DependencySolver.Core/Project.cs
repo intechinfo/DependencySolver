@@ -9,37 +9,37 @@ namespace Invenietis.DependencySolver.Core
 {
     public sealed class Project : IProject
     {
-        readonly ItemContainer<string, string, IProjectDependency> _packageContainer;
+        readonly ItemContainer<string, string, IProjectDependency> _dependencyContainer;
         readonly Dictionary<string, ISolution> _solutions;
 
         public Project( ISolution solution, string path )
         {
             _solutions = new Dictionary<string, ISolution> { { solution.Path, solution } };
             Path = path;
-            _packageContainer = new ItemContainer<string, string, IProjectDependency>(
+            _dependencyContainer = new ItemContainer<string, string, IProjectDependency>(
                 ( id, v ) => new ProjectDependency( this, id, v ),
                 p => p.Name );
         }
 
         public string Path { get; }
 
-        public IReadOnlyCollection<IProjectDependency> Packages => _packageContainer.Items;
+        public IReadOnlyCollection<IProjectDependency> Dependencies => _dependencyContainer.Items;
 
         public IReadOnlyCollection<ISolution> Solutions => _solutions.Values.ToList();
 
-        public IProjectDependency CreateNugetPackage( string name, string version )
+        public IProjectDependency CreateDependency( string name, string version )
         {
             if( string.IsNullOrWhiteSpace( name ) ) ExceptionHelpers.ArgumentException( CoreResources.MustBeNotNullNorWhiteSpace, nameof( name ) );
             if( string.IsNullOrWhiteSpace( version ) ) ExceptionHelpers.ArgumentException( CoreResources.MustBeNotNullNorWhiteSpace, nameof( version ) );
-            return _packageContainer.CreateItem( name, version );
+            return _dependencyContainer.CreateItem( name, version );
         }
 
-        public void AddNugetPackage( IProjectDependency nugetPackage )
+        public void AddDependency( IProjectDependency dependency )
         {
-            if( nugetPackage == null ) throw new ArgumentNullException( nameof( nugetPackage ) );
-            if( !PackageIsInRightContext( nugetPackage ) ) throw new ArgumentException( CoreResources.PackageBelongsToAnotherContext, nameof( nugetPackage ) );
-            _packageContainer.AddItem( nugetPackage );
-            if( !nugetPackage.Projects.Any( p => p == this ) ) nugetPackage.AddProject( this );
+            if( dependency == null ) throw new ArgumentNullException( nameof( dependency ) );
+            if( !DependencyIsInRightContext( dependency ) ) throw new ArgumentException( CoreResources.DependencyBelongsToAnotherContext, nameof( dependency ) );
+            _dependencyContainer.AddItem( dependency );
+            if( !dependency.Projects.Any( p => p == this ) ) dependency.AddProject( this );
         }
 
         public void AddSolution( ISolution solution )
@@ -58,11 +58,11 @@ namespace Invenietis.DependencySolver.Core
             return solution.RepoVersion.GitRepository == Solutions.First().RepoVersion.GitRepository;
         }
 
-        bool PackageIsInRightContext( IProjectDependency package )
+        bool DependencyIsInRightContext( IProjectDependency dependency )
         {
-            Debug.Assert( package != null );
-            if( package.Projects == null ) return false;
-            IProject project = package.Projects.FirstOrDefault();
+            Debug.Assert( dependency != null );
+            if( dependency.Projects == null ) return false;
+            IProject project = dependency.Projects.FirstOrDefault();
             if( project == null || project.Solutions == null ) return false;
             ISolution solution = project.Solutions.FirstOrDefault();
 

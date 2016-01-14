@@ -3,5 +3,6 @@
   <!--<Debug IgnoreDirtyWorkingFolder="true"/>-->
   <Branches>
     <Branch Name="dev" CIVersionMode="LastReleaseBased" />
+    <Branch Name="perso" CIVersionMode="LastReleaseBased" />
   </Branches>
 </RepositoryInfo>

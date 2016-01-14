@@ -1,9 +1,9 @@
 ﻿using System.IO;
-using System.Xml.Linq;
-using Invenietis.DependencySolver.Core;
 using System.Linq;
-using Invenietis.DependencySolver.Core.Abstractions;
+using System.Xml.Linq;
 using Invenietis.DependencySolver.Abstractions;
+using Invenietis.DependencySolver.Core;
+using Invenietis.DependencySolver.Core.Abstractions;
 
 namespace Invenietis.DependencySolver
 {
@@ -19,7 +19,7 @@ namespace Invenietis.DependencySolver
             foreach( var package in packages )
             {
                 IProjectDependency p;
-                project.AddOrCreateNugetPackage( package.Id, package.Version, out p );
+                project.AddOrCreateProjectDependency( package.Id, package.Version, out p );
             }
         }
     }

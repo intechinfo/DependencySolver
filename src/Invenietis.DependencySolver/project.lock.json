@@ -10,6 +10,14 @@
           "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid"
         }
       },
+      "Invenietis.DependencySolver.Core/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid",
+          "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid"
+        }
+      },
       "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
@@ -46,6 +54,14 @@
         "framework": ".NETFramework,Version=v4.6",
         "dependencies": {
           "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencySolver.Core/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid",
+          "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid"
         }
       },
       "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
@@ -86,6 +102,14 @@
           "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid"
         }
       },
+      "Invenietis.DependencySolver.Core/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid",
+          "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid"
+        }
+      },
       "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
@@ -122,6 +146,14 @@
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
           "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencySolver.Core/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid",
+          "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid"
         }
       },
       "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
@@ -162,6 +194,14 @@
           "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid"
         }
       },
+      "Invenietis.DependencySolver.Core/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid",
+          "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid"
+        }
+      },
       "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.6",
@@ -200,6 +240,14 @@
           "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid"
         }
       },
+      "Invenietis.DependencySolver.Core/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "Invenietis.DependencySolver.Core.Abstractions": "0.0.0-Absolutely-Invalid",
+          "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid"
+        }
+      },
       "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.6",
@@ -235,6 +283,10 @@
     "Invenietis.DependencySolver.Abstractions/0.0.0-Absolutely-Invalid": {
       "type": "project",
       "path": "../Invenietis.DependencySolver.Abstractions/project.json"
+    },
+    "Invenietis.DependencySolver.Core/0.0.0-Absolutely-Invalid": {
+      "type": "project",
+      "path": "../Invenietis.DependencySolver.Core/project.json"
     },
     "Invenietis.DependencySolver.Core.Abstractions/0.0.0-Absolutely-Invalid": {
       "type": "project",
@@ -285,6 +337,7 @@
     "": [
       "Invenietis.DependencySolver.Util >= 0.0.0-Absolutely-Invalid",
       "Invenietis.DependencySolver.Abstractions >= 0.0.0-Absolutely-Invalid",
+      "Invenietis.DependencySolver.Core >= 0.0.0-Absolutely-Invalid",
       "LibGit2Sharp >= 0.21.0.176"
     ],
     ".NETFramework,Version=v4.5.1": [

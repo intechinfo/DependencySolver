@@ -5,21 +5,21 @@ namespace Invenietis.DependencySolver.Core
 {
     public static class ProjectExtensions
     {
-        public static bool AddOrCreateNugetPackage( this IProject @this, string name, string version, out IProjectDependency package )
+        public static bool AddOrCreateProjectDependency( this IProject @this, string name, string version, out IProjectDependency dependency )
         {
-            package = @this.Solutions.Select( s => s.RepoVersion.GitRepository )
+            dependency = @this.Solutions.Select( s => s.RepoVersion.GitRepository )
                 .SelectMany( r => r.RepoVersions )
                 .SelectMany( v => v.Solutions )
                 .SelectMany( s => s.Projects )
-                .SelectMany( p => p.Packages )
+                .SelectMany( p => p.Dependencies )
                 .FirstOrDefault( p => p.Name == name && p.Version == version );
-            if( package == null )
+            if( dependency == null )
             {
-                @this.CreateNugetPackage( name, version );
+                @this.CreateDependency( name, version );
                 return true;
             }
 
-            @this.AddNugetPackage( package );
+            @this.AddDependency( dependency );
             return false;
         }
     }

@@ -8,6 +8,7 @@
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
           "Invenietis.DependencySolver.Abstractions": "0.0.0-Absolutely-Invalid",
+          "Invenietis.DependencySolver.Core": "0.0.0-Absolutely-Invalid",
           "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid",
           "LibGit2Sharp": "0.21.0.176"
         },
@@ -100,6 +101,7 @@
         "framework": ".NETFramework,Version=v4.6",
         "dependencies": {
           "Invenietis.DependencySolver.Abstractions": "0.0.0-Absolutely-Invalid",
+          "Invenietis.DependencySolver.Core": "0.0.0-Absolutely-Invalid",
           "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid",
           "LibGit2Sharp": "0.21.0.176"
         },
@@ -192,6 +194,7 @@
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
           "Invenietis.DependencySolver.Abstractions": "0.0.0-Absolutely-Invalid",
+          "Invenietis.DependencySolver.Core": "0.0.0-Absolutely-Invalid",
           "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid",
           "LibGit2Sharp": "0.21.0.176"
         },
@@ -284,6 +287,7 @@
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
           "Invenietis.DependencySolver.Abstractions": "0.0.0-Absolutely-Invalid",
+          "Invenietis.DependencySolver.Core": "0.0.0-Absolutely-Invalid",
           "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid",
           "LibGit2Sharp": "0.21.0.176"
         },
@@ -376,6 +380,7 @@
         "framework": ".NETFramework,Version=v4.6",
         "dependencies": {
           "Invenietis.DependencySolver.Abstractions": "0.0.0-Absolutely-Invalid",
+          "Invenietis.DependencySolver.Core": "0.0.0-Absolutely-Invalid",
           "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid",
           "LibGit2Sharp": "0.21.0.176"
         },
@@ -468,6 +473,7 @@
         "framework": ".NETFramework,Version=v4.6",
         "dependencies": {
           "Invenietis.DependencySolver.Abstractions": "0.0.0-Absolutely-Invalid",
+          "Invenietis.DependencySolver.Core": "0.0.0-Absolutely-Invalid",
           "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid",
           "LibGit2Sharp": "0.21.0.176"
         },

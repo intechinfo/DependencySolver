@@ -8,11 +8,11 @@ namespace Invenietis.DependencySolver.Core.Abstractions
 
         string Path { get; }
 
-        IProjectDependency CreateNugetPackage( string name, string version );
+        IProjectDependency CreateDependency( string name, string version );
 
-        void AddNugetPackage( IProjectDependency package );
+        void AddDependency( IProjectDependency dependency );
 
-        IReadOnlyCollection<IProjectDependency> Packages { get; }
+        IReadOnlyCollection<IProjectDependency> Dependencies { get; }
 
         void AddSolution( ISolution solution );
     }

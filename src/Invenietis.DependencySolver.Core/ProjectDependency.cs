@@ -28,7 +28,7 @@ namespace Invenietis.DependencySolver.Core
             if( project == null ) throw new ArgumentNullException( nameof( project ) );
             if( !ProjectIsInRightContext( project ) ) throw new ArgumentException( CoreResources.ProjectBelongsToAnotherContext, nameof( project ) );
             _projects.Add( project );
-            if( !project.Packages.Any( p => p == this ) ) project.AddNugetPackage( this );
+            if( !project.Dependencies.Any( p => p == this ) ) project.AddDependency( this );
         }
 
         bool ProjectIsInRightContext( IProject project )

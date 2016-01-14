@@ -4,7 +4,7 @@ using SimpleGitVersion;
 namespace Invenietis.DependencySolver.Core.Abstractions.Tests
 {
     [TestFixture]
-    public abstract class NugetPakageTestsBase
+    public abstract class ProjectDependencyTestsBase
     {
         [Test]
         public void AddProject_WithValidProject_ShouldAddTheProject()
@@ -15,13 +15,13 @@ namespace Invenietis.DependencySolver.Core.Abstractions.Tests
             ISolution solution = repoVersion.CreateSolution( "TestSolution1.sln" );
             IProject project1 = solution.CreateProject( @"P1\P1.xproj" );
             IProject project2 = solution.CreateProject( @"P2\P2.xproj" );
-            IProjectDependency sut = project1.CreateNugetPackage( "Nunit", "2.4.6" );
+            IProjectDependency sut = project1.CreateDependency( "Nunit", "2.4.6" );
 
             sut.AddProject( project2 );
 
             Assert.That( sut.Projects, Is.EquivalentTo( new[] { project1, project2 } ) );
-            Assert.That( project1.Packages, Is.EquivalentTo( new[] { sut } ) );
-            Assert.That( project2.Packages, Is.EquivalentTo( new[] { sut } ) );
+            Assert.That( project1.Dependencies, Is.EquivalentTo( new[] { sut } ) );
+            Assert.That( project2.Dependencies, Is.EquivalentTo( new[] { sut } ) );
         }
 
         protected abstract IGitRepository CreateGitRepository( string path );

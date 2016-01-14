@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace Invenietis.DependencySolver.Core.Tests
 {
     [TestFixture]
-    public class NugetPakageTests : NugetPakageTestsBase
+    public class ProjectDependencyTests : ProjectDependencyTestsBase
     {
         protected override IGitRepository CreateGitRepository( string path )
         {

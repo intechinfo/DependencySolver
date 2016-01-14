@@ -10,7 +10,7 @@
 
         internal static readonly string ProjectBelongsToAnotherContext = "The project belongs to another context.";
 
-        internal static readonly string PackageBelongsToAnotherContext = "The nuget package belongs to another context.";
+        internal static readonly string DependencyBelongsToAnotherContext = "The dependency belongs to another context.";
 
         internal static readonly string SolutionBelongsToAnotherContext = "The solution belongs to another context.";
     }

@@ -17,7 +17,7 @@ namespace Invenietis.DependencySolver
             foreach( var dependency in dependencyFinder.Dependencies )
             {
                 IProjectDependency p;
-                project.AddOrCreateNugetPackage( dependency.Key, dependency.Value, out p );
+                project.AddOrCreateProjectDependency( dependency.Key, dependency.Value, out p );
             }
         }
     }

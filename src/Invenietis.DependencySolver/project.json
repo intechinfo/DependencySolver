@@ -13,6 +13,7 @@
   "dependencies": {
     "Invenietis.DependencySolver.Util": "0.0.0-Absolutely-Invalid",
     "Invenietis.DependencySolver.Abstractions": "0.0.0-Absolutely-Invalid",
+    "Invenietis.DependencySolver.Core": "0.0.0-Absolutely-Invalid",
     "LibGit2Sharp": "0.21.0.176"
   },
 
