@@ -1,10 +1,10 @@
 ﻿using NUnitLite;
 
-namespace Invenietis.DependencySolver.Core.Tests
+namespace Invenietis.DependencyCrawler.IO.Tests
 {
     public class Program
     {
-        public static int Main( string[] args )
+        public static int Main(string[] args)
         {
             return new AutoRun().Execute( args );
         }

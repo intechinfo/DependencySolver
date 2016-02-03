@@ -1,0 +1,33 @@
+{
+  "version": "0.0.0-Absolutely-Invalid",
+  "description": "Invenietis.DependencyCrawler.Downloaders.Tests Console Application",
+  "authors": [ "Antoine" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "scripts": {
+    "prebuild": "sgv prebuild"
+  },
+
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "NUnitLite": "3.0.1",
+    "Invenietis.DependencyCrawler.Abstractions.Tests": "0.0.0-Absolutely-Invalid",
+    "Invenietis.DependencyCrawler.IO": "0.0.0-Absolutely-Invalid",
+    "Microsoft.Extensions.Configuration": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final"
+  },
+
+  "commands": {
+    "test": "Invenietis.DependencyCrawler.IO.Tests"
+  },
+
+  "frameworks": {
+    "dnx451": { },
+    "dnx46": { }
+  }
+}

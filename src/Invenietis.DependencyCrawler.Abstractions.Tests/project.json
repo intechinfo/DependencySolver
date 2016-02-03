@@ -1,0 +1,23 @@
+{
+  "version": "0.0.0-Absolutely-Invalid",
+  "description": "Invenietis.DependencyCrawler.Abstractions.Tests Class Library",
+  "authors": [ "Antoine" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "scripts": {
+    "prebuild": "sgv prebuild"
+  },
+
+  "dependencies": {
+    "Invenietis.DependencyCrawler.Abstractions": "0.0.0-Absolutely-Invalid",
+    "NUnit": "3.0.1",
+    "NSubstitute": "1.9.2"
+  },
+
+  "frameworks": {
+    "net451": { },
+    "net46": { }
+  }
+}

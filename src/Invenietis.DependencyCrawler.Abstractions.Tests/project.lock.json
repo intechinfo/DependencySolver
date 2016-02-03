@@ -1,0 +1,299 @@
+{
+  "locked": false,
+  "version": 2,
+  "targets": {
+    ".NETFramework,Version=v4.5.1": {
+      "Invenietis.DependencyCrawler.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "Invenietis.DependencyCrawler.Core": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencyCrawler.Core/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "Invenietis.DependencyCrawler.Util": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencyCrawler.Util/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1"
+      },
+      "NSubstitute/1.9.2": {
+        "type": "package",
+        "compile": {
+          "lib/net45/NSubstitute.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NSubstitute.dll": {}
+        }
+      },
+      "NUnit/3.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/nunit.framework.dll": {}
+        },
+        "runtime": {
+          "lib/net45/nunit.framework.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6": {
+      "Invenietis.DependencyCrawler.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "Invenietis.DependencyCrawler.Core": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencyCrawler.Core/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "Invenietis.DependencyCrawler.Util": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencyCrawler.Util/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6"
+      },
+      "NSubstitute/1.9.2": {
+        "type": "package",
+        "compile": {
+          "lib/net45/NSubstitute.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NSubstitute.dll": {}
+        }
+      },
+      "NUnit/3.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/nunit.framework.dll": {}
+        },
+        "runtime": {
+          "lib/net45/nunit.framework.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.5.1/win7-x86": {
+      "Invenietis.DependencyCrawler.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "Invenietis.DependencyCrawler.Core": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencyCrawler.Core/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "Invenietis.DependencyCrawler.Util": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencyCrawler.Util/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1"
+      },
+      "NSubstitute/1.9.2": {
+        "type": "package",
+        "compile": {
+          "lib/net45/NSubstitute.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NSubstitute.dll": {}
+        }
+      },
+      "NUnit/3.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/nunit.framework.dll": {}
+        },
+        "runtime": {
+          "lib/net45/nunit.framework.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.5.1/win7-x64": {
+      "Invenietis.DependencyCrawler.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "Invenietis.DependencyCrawler.Core": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencyCrawler.Core/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1",
+        "dependencies": {
+          "Invenietis.DependencyCrawler.Util": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencyCrawler.Util/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.1"
+      },
+      "NSubstitute/1.9.2": {
+        "type": "package",
+        "compile": {
+          "lib/net45/NSubstitute.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NSubstitute.dll": {}
+        }
+      },
+      "NUnit/3.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/nunit.framework.dll": {}
+        },
+        "runtime": {
+          "lib/net45/nunit.framework.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6/win7-x86": {
+      "Invenietis.DependencyCrawler.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "Invenietis.DependencyCrawler.Core": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencyCrawler.Core/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "Invenietis.DependencyCrawler.Util": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencyCrawler.Util/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6"
+      },
+      "NSubstitute/1.9.2": {
+        "type": "package",
+        "compile": {
+          "lib/net45/NSubstitute.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NSubstitute.dll": {}
+        }
+      },
+      "NUnit/3.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/nunit.framework.dll": {}
+        },
+        "runtime": {
+          "lib/net45/nunit.framework.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6/win7-x64": {
+      "Invenietis.DependencyCrawler.Abstractions/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "Invenietis.DependencyCrawler.Core": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencyCrawler.Core/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6",
+        "dependencies": {
+          "Invenietis.DependencyCrawler.Util": "0.0.0-Absolutely-Invalid"
+        }
+      },
+      "Invenietis.DependencyCrawler.Util/0.0.0-Absolutely-Invalid": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.6"
+      },
+      "NSubstitute/1.9.2": {
+        "type": "package",
+        "compile": {
+          "lib/net45/NSubstitute.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NSubstitute.dll": {}
+        }
+      },
+      "NUnit/3.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net45/nunit.framework.dll": {}
+        },
+        "runtime": {
+          "lib/net45/nunit.framework.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Invenietis.DependencyCrawler.Abstractions/0.0.0-Absolutely-Invalid": {
+      "type": "project",
+      "path": "../Invenietis.DependencyCrawler.Abstractions/project.json"
+    },
+    "Invenietis.DependencyCrawler.Core/0.0.0-Absolutely-Invalid": {
+      "type": "project",
+      "path": "../Invenietis.DependencyCrawler.Core/project.json"
+    },
+    "Invenietis.DependencyCrawler.Util/0.0.0-Absolutely-Invalid": {
+      "type": "project",
+      "path": "../Invenietis.DependencyCrawler.Util/project.json"
+    },
+    "NSubstitute/1.9.2": {
+      "type": "package",
+      "sha512": "p0HKZIZSY3uSK7TOqo7dn1R7puR1b8VWsaVVty55epljyO/obKH6qlon1Brub6n7m4DoP3AJ+Xit6Gbj92UJ6Q==",
+      "files": [
+        "acknowledgements.txt",
+        "BreakingChanges.txt",
+        "CHANGELOG.txt",
+        "lib/net35/NSubstitute.dll",
+        "lib/net35/NSubstitute.XML",
+        "lib/net40/NSubstitute.dll",
+        "lib/net40/NSubstitute.XML",
+        "lib/net45/NSubstitute.dll",
+        "lib/net45/NSubstitute.XML",
+        "LICENSE.txt",
+        "NSubstitute.1.9.2.nupkg",
+        "NSubstitute.1.9.2.nupkg.sha512",
+        "NSubstitute.nuspec",
+        "README.txt"
+      ]
+    },
+    "NUnit/3.0.1": {
+      "type": "package",
+      "sha512": "Fhz2Flnzlb+HjVxTK+W3dNAb9FUIbGxUp/G6jTTL487lBxInaDOWigNGzWbj1Ipjb87ix77heBCzrsVhk8+X8w==",
+      "files": [
+        "CHANGES.txt",
+        "lib/dotnet/nunit.framework.dll",
+        "lib/dotnet/nunit.framework.xml",
+        "lib/net20/nunit.framework.dll",
+        "lib/net20/nunit.framework.xml",
+        "lib/net40/nunit.framework.dll",
+        "lib/net40/nunit.framework.xml",
+        "lib/net45/nunit.framework.dll",
+        "lib/net45/nunit.framework.xml",
+        "lib/portable-net45+win8+wp8+wpa81+Xamarin.Mac+MonoAndroid10+MonoTouch10+Xamarin.iOS10/nunit.framework.dll",
+        "lib/portable-net45+win8+wp8+wpa81+Xamarin.Mac+MonoAndroid10+MonoTouch10+Xamarin.iOS10/nunit.framework.xml",
+        "LICENSE.txt",
+        "NOTICES.txt",
+        "NUnit.3.0.1.nupkg",
+        "NUnit.3.0.1.nupkg.sha512",
+        "NUnit.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "": [
+      "Invenietis.DependencyCrawler.Abstractions >= 0.0.0-Absolutely-Invalid",
+      "NUnit >= 3.0.1",
+      "NSubstitute >= 1.9.2"
+    ],
+    ".NETFramework,Version=v4.5.1": [],
+    ".NETFramework,Version=v4.6": []
+  }
+}

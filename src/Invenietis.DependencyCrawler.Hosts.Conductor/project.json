@@ -1,0 +1,32 @@
+{
+  "version": "0.0.0-Absolutely-Invalid",
+  "description": "Invenietis.DependencyCrawler.Hosts.Conductor Console Application",
+  "authors": [ "Antoine" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "scripts": {
+    "prebuild": "sgv prebuild"
+  },
+
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "Microsoft.Extensions.Configuration": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
+    "Invenietis.DependencyCrawler": "0.0.0-Absolutely-Invalid",
+    "Invenietis.DependencyCrawler.IO": "0.0.0-Absolutely-Invalid"
+  },
+
+  "commands": {
+    "Invenietis.DependencyCrawler.Hosts.Conductor": "Invenietis.DependencyCrawler.Hosts.Conductor"
+  },
+
+  "frameworks": {
+    "dnx451": { },
+    "dnx46": { }
+  }
+}

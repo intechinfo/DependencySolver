@@ -1,0 +1,31 @@
+{
+  "version": "0.0.0-Absolutely-Invalid",
+  "description": "Invenietis.DependencyCrawler.Tests Console Application",
+  "authors": [ "Antoine" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "scripts": {
+    "prebuild": "sgv prebuild"
+  },
+
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "NUnitLite": "3.0.1",
+    "Invenietis.DependencyCrawler": "0.0.0-Absolutely-Invalid",
+    "Invenietis.DependencyCrawler.Abstractions.Tests": "0.0.0-Absolutely-Invalid"
+  },
+
+  "commands": {
+    "test": "Invenietis.DependencyCrawler.Tests"
+  },
+
+  "frameworks": {
+    "dnx451": { },
+    "dnx46": { }
+  }
+}
