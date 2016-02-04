@@ -15,17 +15,11 @@ namespace Invenietis.DependencyCrawler.Tests
         protected override ICrawler CreateCrawler(
             IPackageDownloader downloader,
             IPackageRepository repository,
-            ICrawlerStateStorage stateStorage,
-            IInJobQueue inJobQueue,
-            IOutJobQueue outJobQueue,
             PackageSegment segment )
         {
             return new Crawler(
                 downloader,
                 repository,
-                stateStorage,
-                inJobQueue,
-                outJobQueue,
                 segment );
         }
     }

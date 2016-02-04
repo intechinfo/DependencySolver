@@ -9,18 +9,21 @@ namespace Invenietis.DependencyCrawler.Core.Tests
         [Test]
         public void Ctor_WithInvalidArg_ShouldThrowArgumentNullException()
         {
-            Assert.Throws<ArgumentException>( () => new VPackageId( null, "1.0.0" ) );
-            Assert.Throws<ArgumentException>( () => new VPackageId( "", "1.0.0" ) );
-            Assert.Throws<ArgumentException>( () => new VPackageId( "  ", "1.0.0" ) );
-            Assert.Throws<ArgumentException>( () => new VPackageId( "PackageId", null ) );
-            Assert.Throws<ArgumentException>( () => new VPackageId( "PackageId", "" ) );
-            Assert.Throws<ArgumentException>( () => new VPackageId( "PackageId", "   " ) );
+            Assert.Throws<ArgumentException>( () => new VPackageId( null, "PackageId", "1.0.0" ) );
+            Assert.Throws<ArgumentException>( () => new VPackageId( "", "PackageId", "1.0.0" ) );
+            Assert.Throws<ArgumentException>( () => new VPackageId( " ", "PackageId", "1.0.0" ) );
+            Assert.Throws<ArgumentException>( () => new VPackageId( PackageId.NuGet, null, "1.0.0" ) );
+            Assert.Throws<ArgumentException>( () => new VPackageId( PackageId.NuGet, "", "1.0.0" ) );
+            Assert.Throws<ArgumentException>( () => new VPackageId( PackageId.NuGet, "  ", "1.0.0" ) );
+            Assert.Throws<ArgumentException>( () => new VPackageId( PackageId.NuGet, "PackageId", null ) );
+            Assert.Throws<ArgumentException>( () => new VPackageId( PackageId.NuGet, "PackageId", "" ) );
+            Assert.Throws<ArgumentException>( () => new VPackageId( PackageId.NuGet, "PackageId", "   " ) );
         }
 
         [Test]
         public void Ctor_WithValidInput_ShouldCreatePackageInfoCorrectly()
         {
-            VPackageId sut = new VPackageId( "PackageId", "1.0.0" );
+            VPackageId sut = new VPackageId( PackageId.NuGet, "PackageId", "1.0.0" );
             Assert.That( sut.Id, Is.EqualTo( "PackageId" ) );
             Assert.That( sut.Version, Is.EqualTo( "1.0.0" ) );
         }
@@ -30,8 +33,8 @@ namespace Invenietis.DependencyCrawler.Core.Tests
         [TestCase( "PackageId", "2.0.0", false )]
         public void Equals_WithSomePackages( string packageId, string version, bool expected )
         {
-            VPackageId sut = new VPackageId( "PackageId", "1.0.0" );
-            VPackageId other = new VPackageId( packageId, version );
+            VPackageId sut = new VPackageId( PackageId.NuGet, "PackageId", "1.0.0" );
+            VPackageId other = new VPackageId( PackageId.NuGet, packageId, version );
 
             Assert.That( sut.Equals( other ), Is.EqualTo( expected ) );
         }
@@ -40,7 +43,7 @@ namespace Invenietis.DependencyCrawler.Core.Tests
         [Test]
         public void Equals_WithNonPackageInfo_ShouldReturnFalse()
         {
-            VPackageId sut = new VPackageId( "PackageId", "1.0.0" );
+            VPackageId sut = new VPackageId( PackageId.NuGet, "PackageId", "1.0.0" );
             Assert.That( sut.Equals( null ), Is.False );
             Assert.That( sut.Equals( "wrong type" ), Is.False );
         }

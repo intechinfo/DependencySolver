@@ -22,7 +22,7 @@ namespace Invenietis.DependencyCrawler.IO
             List<IPackage> packages = await Task.Factory.StartNew( () =>
                 PackageRepository
                     .GetPackages()
-                    .Where( p => p.Id == packageInfo.Id )
+                    .Where( p => p.Id == packageInfo.Value )
                     .ToList()
                     .OrderByDescending( p => p.Version )
                     .ToList() );
@@ -54,7 +54,7 @@ namespace Invenietis.DependencyCrawler.IO
             List<VPackageId> dependencies = package.DependencySets
                 .SelectMany( s => s.Dependencies )
                 .Distinct( comparer )
-                .Select( d => new VPackageId( d.Id, d.VersionSpec.MinVersion.ToString() ) )
+                .Select( d => new VPackageId( PackageId.NuGet, d.Id, d.VersionSpec.MinVersion.ToString() ) )
                 .ToList();
 
             return new PackageInfo( vPackageInfo, dependencies );

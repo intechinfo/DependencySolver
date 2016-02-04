@@ -1,9 +1,9 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Invenietis.DependencyCrawler.Core;
+using System.Linq;
 
 namespace Invenietis.DependencyCrawler.Abstractions.Tests
 {
@@ -11,174 +11,158 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
     public abstract class PackageRepositoryTestsBase
     {
         [Test]
-        public async Task ExistsVPackage_WithAnExistingVPackage_ShouldReturnTrue()
+        public async Task AddIfNotExists_WithNewPackageId_ShouldAddThisPackageId()
         {
             IPackageRepository sut = CreatePackageRepository();
-            string packageName = $"Test{Guid.NewGuid()}";
-            VPackageId vPackageId = new VPackageId( packageName, "1.0.0" );
-            await sut.AddOrUpdateVPackage( new VPackage( vPackageId ) );
+            PackageId packageId = new PackageId( "Test", Guid.NewGuid().ToString() );
 
-            bool result = await sut.ExistsVPackage( vPackageId );
+            await sut.AddIfNotExists( packageId );
+
+            IEnumerable<PackageId> packageIds = await sut.GetPackageIds( new PackageSegment( "Test", packageId.Value, $"{packageId.Value}a" ) );
+            Assert.That( packageIds, Contains.Item( packageId ) );
+        }
+
+        [Test]
+        public async Task AddIfNotExists_WithNewPackageId_ShouldReturnTrue()
+        {
+            IPackageRepository sut = CreatePackageRepository();
+            PackageId packageId = new PackageId( "Test", Guid.NewGuid().ToString() );
+
+            bool result = await sut.AddIfNotExists( packageId );
 
             Assert.That( result, Is.True );
         }
 
         [Test]
-        public async Task ExistsVPackage_WithANotExistingVPackage_ShouldReturnFalse()
+        public async Task AddIfNotExists_WithAnExistingPackageId_ShouldReturnFalse()
         {
             IPackageRepository sut = CreatePackageRepository();
-            string packageName = $"Test{Guid.NewGuid()}";
-            VPackageId vPackageId = new VPackageId( packageName, "1.0.0" );
+            PackageId packageId = new PackageId( "Test", Guid.NewGuid().ToString() );
+            bool result = await sut.AddIfNotExists( packageId );
 
-            bool result = await sut.ExistsVPackage( vPackageId );
+            result = await sut.AddIfNotExists( packageId );
 
             Assert.That( result, Is.False );
         }
 
         [Test]
-        public async Task GetVPackageById_WithAnExistingVPackage_ShouldReturnThisVPackage()
+        public async Task AddIfNotExists_WithNewVPackageId_ShouldAddThisVPackageId()
         {
             IPackageRepository sut = CreatePackageRepository();
-            string packageName = $"Test{Guid.NewGuid()}";
-            VPackageId vPackageId = new VPackageId( packageName, "1.0.0" );
-            VPackage vPackage = new VPackage( vPackageId );
-            await sut.AddOrUpdateVPackage( vPackage );
+            VPackageId vPackageId = new VPackageId( "Test", Guid.NewGuid().ToString(), "1.0.0" );
 
-            VPackage result = await sut.GetVPackageById( vPackageId );
+            await sut.AddIfNotExists( vPackageId );
 
-            Assert.That( result, Is.EqualTo( vPackage ) );
+            IEnumerable<VPackageId> vPackageIds = await sut.GetVPackageIds( new PackageSegment( "Test", vPackageId.Id ) );
+            Assert.That( vPackageIds, Contains.Item( vPackageId ) );
         }
 
         [Test]
-        public async Task GetVPackageById_WithANotExistingVPackage_ShouldReturnNull()
+        public async Task AddIfNotExists_WithNewVPackageId_ShouldReturnTrue()
         {
             IPackageRepository sut = CreatePackageRepository();
-            string packageName = $"Test{Guid.NewGuid()}";
-            VPackageId vPackageId = new VPackageId( packageName, "1.0.0" );
-            VPackage vPackage = new VPackage( vPackageId );
+            VPackageId vPackageId = new VPackageId( "Test", Guid.NewGuid().ToString(), "1.0.0" );
 
-            VPackage result = await sut.GetVPackageById( vPackageId );
+            bool result = await sut.AddIfNotExists( vPackageId );
 
-            Assert.That( result, Is.Null );
+            Assert.That( result, Is.True );
         }
 
         [Test]
-        public async Task GetVPackageById_WithVPackageContainingDependencies_ShouldReturnThisVPackage()
+        public async Task AddIfNotExists_WithAnExistingVPackageId_ShouldReturnFalse()
         {
             IPackageRepository sut = CreatePackageRepository();
-            string packageName = $"Test{Guid.NewGuid()}";
-            VPackageId vPackageId = new VPackageId( packageName, "1.0.0" );
-            VPackage vPackage = new VPackage( vPackageId, new[]
-            {
-                new VPackageId( "P1", "1.2.3" ),
-                new VPackageId( "P2", "2.3.4" )
-            } );
-            await sut.AddOrUpdateVPackage( vPackage );
+            VPackageId vPackageId = new VPackageId( "Test", Guid.NewGuid().ToString(), "1.0.0" );
+            await sut.AddIfNotExists( vPackageId );
 
-            VPackage result = await sut.GetVPackageById( vPackageId );
+            bool result = await sut.AddIfNotExists( vPackageId );
 
-            Assert.That( result, Is.EqualTo( vPackage ) );
+            Assert.That( result, Is.False );
         }
 
         [Test]
-        public async Task GetVPackageById_WithNotFoundVPackage_ShouldReturnThisVPackage()
+        public async Task UpdateLastRelease_WithValidInput_ShouldUpdateLastRelease()
         {
             IPackageRepository sut = CreatePackageRepository();
-            string packageName = $"Test{Guid.NewGuid()}";
-            VPackageId vPackageId = new VPackageId( packageName, "1.0.0" );
-            VPackage vPackage = new VPackage( vPackageId, true );
-            await sut.AddOrUpdateVPackage( vPackage );
+            PackageId packageId = new PackageId( "Test", Guid.NewGuid().ToString() );
+            await sut.AddIfNotExists( packageId );
+            VPackageId lastRelease = new VPackageId( "Test", packageId.Value, "1.0.0" );
+            await sut.AddIfNotExists( lastRelease );
 
-            VPackage result = await sut.GetVPackageById( vPackageId );
+            await sut.UpdateLastRelease( packageId, lastRelease );
 
-            Assert.That( result, Is.EqualTo( vPackage ) );
+            Package package = await sut.GetPackageById( packageId );
+            Assert.That( package, Is.EqualTo(
+                new Package(
+                    packageId,
+                    new VPackage( lastRelease ) ) ) );
         }
 
         [Test]
-        public async Task GetPackageById_WithNotExistingPackage_ShouldReturnNull()
+        public async Task UpdateLastPreRelease_WithValidInput_ShouldUpdateLastPreRelease()
         {
             IPackageRepository sut = CreatePackageRepository();
-            PackageId packageId = new PackageId( $"Test{Guid.NewGuid()}" );
+            PackageId packageId = new PackageId( "Test", Guid.NewGuid().ToString() );
+            await sut.AddIfNotExists( packageId );
+            VPackageId lastPreRelease = new VPackageId( "Test", packageId.Value, "2.0.0-alpha" );
+            await sut.AddIfNotExists( lastPreRelease );
 
-            Package result = await sut.GetPackageById( packageId );
+            await sut.UpdateLastPreRelease( packageId, lastPreRelease );
 
-            Assert.That( result, Is.Null );
+            Package package = await sut.GetPackageById( packageId );
+            Assert.That( package, Is.EqualTo(
+                new Package(
+                    packageId,
+                    null,
+                    new VPackage( lastPreRelease ) ) ) );
         }
 
         [Test]
-        public async Task GetPackageById_WithExistingPackage_ShouldReturnThisPackage()
+        public async Task AddDependenciesIfNotExists_With2Depedencies_ShouldAddThis2Dependencies()
         {
             IPackageRepository sut = CreatePackageRepository();
-            string packageName = $"Test{Guid.NewGuid()}";
-            PackageId packageId = new PackageId( packageName );
-            Package package = new Package(
-                packageName,
-                new VPackage(
-                    new VPackageId( "P1", "1.0.0" ),
-                    new[] { new VPackageId( "P2", "2.0.0" ) } ),
-                new VPackage(
-                    new VPackageId( "P1", "1.0.1-beta" ),
-                    new[] { new VPackageId( "P2", "2.0.0" ) } ) );
-            await sut.AddOrUpdatePackage( package );
+            PackageId packageId = new PackageId( "Test", Guid.NewGuid().ToString() );
+            await sut.AddIfNotExists( packageId );
+            VPackageId lastRelease = new VPackageId( "Test", packageId.Value, "1.0.0" );
+            VPackageId lastPreRelease = new VPackageId( "Test", packageId.Value, "2.0.0-alpha" );
+            await sut.AddIfNotExists( lastRelease );
+            await sut.AddIfNotExists( lastPreRelease );
+            await sut.UpdateLastRelease( packageId, lastRelease );
+            await sut.UpdateLastPreRelease( packageId, lastPreRelease );
+            VPackageId dependencyId1 = new VPackageId( "Test", Guid.NewGuid().ToString(), "1.0.0" );
+            VPackageId dependencyId2 = new VPackageId( "Test", Guid.NewGuid().ToString(), "1.0.0" );
+            IEnumerable<VPackageId> dependencyIds = new[] { dependencyId1, dependencyId2 };
 
-            Package result = await sut.GetPackageById( packageId );
+            await sut.AddDependenciesIfNotExists( lastRelease, dependencyIds );
 
-            Assert.That( result, Is.EqualTo( package ) );
-        }
-
-        [Test]
-        public async Task AddOrUpdateVPackage_WithExistingVPackage_ShouldUpdateTheVPackage()
-        {
-            IPackageRepository sut = CreatePackageRepository();
-
-            string packageName = $"Test{Guid.NewGuid()}";
-            VPackageId vPackageId = new VPackageId( packageName, "1.0.0" );
-            VPackage vPackage1 = new VPackage( vPackageId );
-            await sut.AddOrUpdateVPackage( vPackage1 );
-
-            VPackage vPackage2 = new VPackage( vPackageId, new[] { new VPackageId( "P1", "1.0.0" ) } );
-            await sut.AddOrUpdateVPackage( vPackage2 );
-
-            VPackage result = await sut.GetVPackageById( vPackageId );
-
-            Assert.That( result, Is.EqualTo( vPackage2 ) );
-        }
-
-        [Test]
-        public async Task AddOrUpdatePackage_WithExistingPackage_ShouldUpdateThePackage()
-        {
-            IPackageRepository sut = CreatePackageRepository();
-            string packageName = $"Test{Guid.NewGuid()}";
-            PackageId packageId = new PackageId( packageName );
-
-            {
-                Package tmpPackage = new Package(
-                    packageName,
+            Package package = await sut.GetPackageById( packageId );
+            Assert.That( package, Is.EqualTo(
+                new Package(
+                    packageId,
                     new VPackage(
-                        new VPackageId( "P1", "1.0.0" ),
-                        new[] { new VPackageId( "P2", "2.0.0" ) } ),
-                    new VPackage(
-                        new VPackageId( "P1", "1.0.1-beta" ),
-                        new[] { new VPackageId( "P2", "2.0.0" ) } ) );
-                await sut.AddOrUpdatePackage( tmpPackage );
-            }
+                        lastRelease,
+                        new[]
+                        {
+                            new VPackage( dependencyId1 ),
+                            new VPackage( dependencyId2 )
+                        } ),
+                    new VPackage( lastPreRelease ) ) ) );
+        }
 
-            Package package;
-            {
-                package = new Package(
-                    packageName,
-                    new VPackage(
-                        new VPackageId( "P1", "1.0.1" ),
-                        new[] { new VPackageId( "P2", "2.0.0" ) } ),
-                    new VPackage(
-                        new VPackageId( "P1", "2.0.0-beta" ),
-                        new[] { new VPackageId( "P2", "3.0.0" ) } ) );
-                await sut.AddOrUpdatePackage( package );
-            }
+        [Test]
+        public async Task GetNotCrawledVPackageIds_WorksCorrectly()
+        {
+            IPackageRepository sut = CreatePackageRepository();
+            VPackageId vPackageId = new VPackageId( "Test", Guid.NewGuid().ToString(), "1.0.0" );
+            await sut.AddIfNotExists( vPackageId );
 
-            Package result = await sut.GetPackageById( packageId );
+            IEnumerable<VPackageId> notCrawled = await sut.GetNotCrawledVPackageIds( new PackageSegment( "Test", vPackageId.Id ) );
+            Assert.That( notCrawled, Contains.Item( vPackageId ) );
 
-            Assert.That( result, Is.EqualTo( package ) );
+            await sut.AddDependenciesIfNotExists( vPackageId, null );
+
+            notCrawled = await sut.GetNotCrawledVPackageIds( new PackageSegment( "Test", vPackageId.Id ) );
+            Assert.That( notCrawled.Count( x => x == vPackageId ), Is.EqualTo( 0 ) );
         }
 
         protected abstract IPackageRepository CreatePackageRepository();

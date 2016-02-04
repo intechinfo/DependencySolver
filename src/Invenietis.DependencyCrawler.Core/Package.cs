@@ -4,31 +4,51 @@ namespace Invenietis.DependencyCrawler.Core
 {
     public class Package
     {
-        public Package( string name, VPackage lastRelease )
-            : this( name, lastRelease, null )
+        public Package( string packageManager, string id, VPackage lastRelease )
+            : this( packageManager, id, lastRelease, null )
         {
         }
 
-        public Package( string name, VPackage lastRelease, VPackage lastPreRelease )
-            : this( name, lastRelease, lastPreRelease, false )
+        public Package( PackageId id, VPackage lastRelease )
+            : this( id, lastRelease, null )
         {
         }
 
-        public Package( string name, VPackage lastRelease, VPackage lastPreRelease, bool isNotFound )
+        public Package( string packageManager, string id, VPackage lastRelease, VPackage lastPreRelease )
+            : this( packageManager, id, lastRelease, lastPreRelease, false )
+        {
+        }
+
+        public Package( PackageId id, VPackage lastRelease, VPackage lastPreRelease )
+            : this( id, lastRelease, lastPreRelease, false )
+        {
+        }
+
+        public Package( string packageManager, string id, VPackage lastRelease, VPackage lastPreRelease, bool isNotFound )
+            : this( new PackageId( packageManager, id ), lastRelease, lastPreRelease, isNotFound )
+        {
+        }
+
+        public Package( PackageId id, VPackage lastRelease, VPackage lastPreRelease, bool isNotFound )
         {
             if( isNotFound && ( lastRelease != null || lastPreRelease != null ) ) throw new ArgumentException();
 
-            Name = name;
+            Id = id;
             LastRelease = lastRelease;
             LastPreRelease = lastPreRelease;
         }
 
-        public Package( string name )
-            : this( name, null, null, true )
+        public Package( string packageManager, string id )
+            : this( packageManager, id, null, null, true )
         {
         }
 
-        public string Name { get; }
+        public Package( PackageId id )
+            : this( id, null, null, true )
+        {
+        }
+
+        public PackageId Id { get; }
 
         public VPackage LastRelease { get; }
 
@@ -40,15 +60,15 @@ namespace Invenietis.DependencyCrawler.Core
         {
             Package other = obj as Package;
             return other != null
-                && other.Name == Name
+                && other.Id == Id
                 && other.IsNotFound == IsNotFound
-                && ( ( other.LastRelease == null && LastRelease == null ) || other.LastRelease.Equals( LastRelease ) )
-                && ( ( other.LastPreRelease == null && LastPreRelease == null ) || other.LastPreRelease.Equals( LastPreRelease ) );
+                && other.LastRelease == LastRelease
+                && other.LastPreRelease == LastPreRelease;
         }
 
         public override int GetHashCode()
         {
-            return Name.GetHashCode() << 11
+            return Id.GetHashCode() << 11
                 ^ IsNotFound.GetHashCode() << 7
                 ^ LastRelease.GetHashCode() << 3
                 ^ LastPreRelease.GetHashCode();

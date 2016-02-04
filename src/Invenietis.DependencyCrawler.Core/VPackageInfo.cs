@@ -17,12 +17,24 @@ namespace Invenietis.DependencyCrawler.Core
         public override bool Equals( object obj )
         {
             VPackageInfo other = obj as VPackageInfo;
-            return other != null && other.VPackageId.Equals( VPackageId ) && other.MaxVersion.Equals( MaxVersion );
+            return other != null
+                && other.VPackageId == VPackageId
+                && other.MaxVersion == MaxVersion;
         }
 
         public override int GetHashCode()
         {
             return VPackageId.GetHashCode() << 3 ^ MaxVersion.GetHashCode();
+        }
+
+        public static bool operator ==(VPackageInfo i1, VPackageInfo i2)
+        {
+            return ReferenceEquals( i1, i2 ) || ( !ReferenceEquals( i1, null ) && i1.Equals( i2 ) );
+        }
+
+        public static bool operator !=( VPackageInfo i1, VPackageInfo i2 )
+        {
+            return !( i1 == i2 );
         }
     }
 }

@@ -8,18 +8,18 @@
         {
         }
 
-        public PackageMaxVersion( string maxVersion )
-            : this( maxVersion, string.Empty )
+        public PackageMaxVersion( string releaseMaxVersion )
+            : this( releaseMaxVersion, string.Empty )
         {
         }
 
-        public PackageMaxVersion( string maxVersion, string preReleaseMaxVersion )
+        public PackageMaxVersion( string releaseMaxVersion, string preReleaseMaxVersion )
         {
-            MaxVersion = maxVersion;
+            ReleaseMaxVersion = releaseMaxVersion;
             PreReleaseMaxVersion = preReleaseMaxVersion;
         }
 
-        public string MaxVersion { get; }
+        public string ReleaseMaxVersion { get; }
 
         public string PreReleaseMaxVersion { get; }
 
@@ -30,18 +30,30 @@
 
         public bool HasReleaseMaxVersion
         {
-            get { return MaxVersion != string.Empty; }
+            get { return ReleaseMaxVersion != string.Empty; }
         }
 
         public override bool Equals( object obj )
         {
             PackageMaxVersion other = obj as PackageMaxVersion;
-            return other != null && other.MaxVersion == MaxVersion && other.PreReleaseMaxVersion == PreReleaseMaxVersion;
+            return other != null
+                && other.ReleaseMaxVersion == ReleaseMaxVersion
+                && other.PreReleaseMaxVersion == PreReleaseMaxVersion;
         }
 
         public override int GetHashCode()
         {
-            return MaxVersion.GetHashCode() << 7 ^ PreReleaseMaxVersion.GetHashCode();
+            return ReleaseMaxVersion.GetHashCode() << 7 ^ PreReleaseMaxVersion.GetHashCode();
+        }
+
+        public static bool operator ==( PackageMaxVersion v1, PackageMaxVersion v2 )
+        {
+            return ReferenceEquals( v1, v2 ) || ( !ReferenceEquals( v1, null ) && v1.Equals( v2 ) );
+        }
+
+        public static bool operator !=( PackageMaxVersion v1, PackageMaxVersion v2 )
+        {
+            return !( v1 == v2 );
         }
     }
 }

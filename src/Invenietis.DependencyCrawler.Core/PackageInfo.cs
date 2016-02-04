@@ -17,11 +17,11 @@ namespace Invenietis.DependencyCrawler.Core
             if( packageInfo == null ) throw new ArgumentNullException( nameof( packageInfo ) );
             if( dependencies == null ) throw new ArgumentNullException( nameof( dependencies ) );
 
-            VPackageInfo = packageInfo;
+            VPackageId = packageInfo;
             Dependencies = dependencies;
         }
 
-        public VPackageId VPackageInfo { get; }
+        public VPackageId VPackageId { get; }
 
         public IReadOnlyCollection<VPackageId> Dependencies { get; }
     }

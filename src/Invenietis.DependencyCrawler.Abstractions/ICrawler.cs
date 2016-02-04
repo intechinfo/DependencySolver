@@ -9,14 +9,10 @@ namespace Invenietis.DependencyCrawler.Abstractions
 
         IPackageRepository PackageRepository { get; }
 
-        ICrawlerStateStorage CrawlerStateStorage { get; }
-
-        IInJobQueue InJobQueue { get; }
-
-        IOutJobQueue OutJobQueue { get; }
-
         PackageSegment Segment { get; }
 
         Task Start();
+
+        Task Start( int steps );
     }
 }

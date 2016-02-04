@@ -5,23 +5,29 @@ namespace Invenietis.DependencyCrawler.Core
 {
     public class PackageSegment
     {
-        public PackageSegment( string start, string end )
+        public PackageSegment( string packageManager, string start )
+            : this( packageManager, start, string.Empty )
         {
-            if( string.IsNullOrWhiteSpace( start ) ) ExceptionHelpers.ArgumentException( CoreResources.MustBeNotNullNorWhiteSpace, nameof( start ) );
-            if( string.IsNullOrWhiteSpace( end ) ) ExceptionHelpers.ArgumentException( CoreResources.MustBeNotNullNorWhiteSpace, nameof( end ) );
-            if( start.CompareTo( end ) > 0 ) throw new ArgumentException( CoreResources.StartMustBeLowerThanEnd );
+        }
 
+        public PackageSegment( string packageManager, string start, string end )
+        {
+            end = end ?? string.Empty;
+            if( string.IsNullOrWhiteSpace( packageManager ) ) ExceptionHelpers.ArgumentException( CoreResources.MustBeNotNullNorWhiteSpace, nameof( packageManager ) );
+            if( string.IsNullOrWhiteSpace( start ) ) ExceptionHelpers.ArgumentException( CoreResources.MustBeNotNullNorWhiteSpace, nameof( start ) );
+            if( end != string.Empty && start.CompareTo( end ) > 0 ) throw new ArgumentException( CoreResources.StartMustBeLowerThanEnd );
+
+            PackageManager = packageManager;
             Start = start;
             End = end;
         }
+
+        public string PackageManager { get; }
 
         public string Start { get; }
 
         public string End { get; }
 
-        public bool Contains( string s )
-        {
-            return Start.ToLower().CompareTo( s.ToLower() ) <= 0 && s.ToLower().CompareTo( End.ToLower() ) <= 0;
-        }
+        public bool HasEnd => End != string.Empty;
     }
 }

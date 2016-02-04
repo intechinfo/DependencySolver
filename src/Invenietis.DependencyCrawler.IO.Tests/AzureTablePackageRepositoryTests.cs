@@ -1,12 +1,11 @@
-﻿using Invenietis.DependencyCrawler.Abstractions.Tests;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Invenietis.DependencyCrawler.Abstractions;
+using Invenietis.DependencyCrawler.Abstractions.Tests;
+using Invenietis.DependencyCrawler.Core;
 using Invenietis.DependencyCrawler.IO;
 using Microsoft.Extensions.Configuration;
+using NUnit.Framework;
 
 namespace Invenietis.DependencyCrawler.Tests
 {
@@ -18,7 +17,9 @@ namespace Invenietis.DependencyCrawler.Tests
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile( "appsettings.json" )
                 .Build();
-            return new AzureTablePackageRepository( configuration[ "Data:AzureTableConnection" ] );
+            string connectionString = configuration[ "Data:AzureStorage:ConnectionString" ];
+            string packageTable = configuration[ "Data:AzureStorage:PackageTable" ];
+            return new AzureTablePackageRepository( connectionString, packageTable );
         }
     }
 }

@@ -15,192 +15,299 @@ namespace Invenietis.DependencyCrawler.IO
     public class AzureTablePackageRepository : IPackageRepository
     {
         readonly string _connectionString;
+        readonly string _tableName;
 
-        public AzureTablePackageRepository( string connectionString )
+        public AzureTablePackageRepository( string connectionString, string tableName )
         {
             _connectionString = connectionString;
+            _tableName = tableName;
         }
 
-        public async Task AddOrUpdatePackage( Package package )
+        public async Task AddDependenciesIfNotExists( VPackageId vPackageId, IEnumerable<VPackageId> dependencies )
         {
-            TableOperation operation = TableOperation.InsertOrReplace( new PackageEntity( package ) );
-            await PackageTable.ExecuteAsync( operation );
+            TableOperation retrieveOperation = TableOperation.Retrieve<NotCrawledVPackageEntity>( vPackageId.PackageManager, $"NotCrawledVPackage|{vPackageId.Id}|{vPackageId.Version}" );
+            TableResult result = await PackageTable.ExecuteAsync( retrieveOperation );
+            NotCrawledVPackageEntity notCrawledEntity = ( NotCrawledVPackageEntity )result.Result;
+            if( notCrawledEntity == null ) return;
+
+            TableOperation deleteOperation = TableOperation.Delete( notCrawledEntity );
+            await PackageTable.ExecuteAsync( deleteOperation );
+            retrieveOperation = TableOperation.Retrieve<VPackageEntity>( vPackageId.PackageManager, $"VPackage|{vPackageId.Id}|{vPackageId.Version}" );
+            result = await PackageTable.ExecuteAsync( retrieveOperation );
+            VPackageEntity vPackageEntity = ( VPackageEntity )result.Result;
+            if( vPackageEntity == null ) return;
+
+            vPackageEntity.Dependencies = SerializeDependencies( dependencies );
+            TableOperation insertOperation = TableOperation.InsertOrReplace( vPackageEntity );
+            await PackageTable.ExecuteAsync( insertOperation );
         }
 
-        public async Task AddOrUpdateVPackage( VPackage vPackage )
+        string SerializeDependencies( IEnumerable<VPackageId> dependencies )
         {
-            TableOperation operation = TableOperation.InsertOrReplace( new VPackageEntity( vPackage ) );
-            await VPackageTable.ExecuteAsync( operation );
+            if( dependencies == null ) dependencies = new VPackageId[ 0 ];
+            return new XElement(
+                "Dependencies",
+                dependencies.Select( d => new XElement(
+                    "Dependency",
+                    new XAttribute( "PackageManager", d.PackageManager ),
+                    new XAttribute( "Id", d.Id ),
+                    new XAttribute( "Version", d.Version ) ) ) )
+                .ToString();
         }
 
-        public async Task<bool> ExistsVPackage( VPackageId vPackageId )
+        public Task<bool> AddIfNotExists( PackageId packageId )
         {
-            TableOperation operation = TableOperation.Retrieve( "NuGet", $"{vPackageId.Id}_{vPackageId.Version}" );
-            TableResult result = await VPackageTable.ExecuteAsync( operation );
-            return result.Result != null;
+            return AddIfNotExists(
+                new PackageEntity( packageId ),
+                packageId.PackageManager,
+                $"Package|{packageId.Value}" );
+        }
+
+        public async Task<bool> AddIfNotExists( VPackageId vPackageId )
+        {
+            TableOperation retrieveOperation = TableOperation.Retrieve( vPackageId.PackageManager, $"VPackage|{vPackageId.Id}|{vPackageId.Version}" );
+            TableResult retrieved = await PackageTable.ExecuteAsync( retrieveOperation );
+            if( retrieved.Result != null ) return false;
+
+            TableOperation insertOperation = TableOperation.Insert( new NotCrawledVPackageEntity( vPackageId ) );
+            await PackageTable.ExecuteAsync( insertOperation );
+            insertOperation = TableOperation.Insert( new VPackageEntity( vPackageId ) );
+            await PackageTable.ExecuteAsync( insertOperation );
+            return true;
+        }
+
+        async Task<bool> AddIfNotExists( ITableEntity entity, string partitionKey, string rowKey )
+        {
+            TableOperation retrieveOperation = TableOperation.Retrieve( partitionKey, rowKey );
+            TableResult retrieved = await PackageTable.ExecuteAsync( retrieveOperation );
+            if( retrieved.Result != null ) return false;
+
+            TableOperation insertOperation = TableOperation.Insert( entity );
+            await PackageTable.ExecuteAsync( insertOperation );
+            return true;
+        }
+
+        public async Task<IEnumerable<Package>> GetAllPackages()
+        {
+            string filter = TableQuery.CombineFilters(
+                    TableQuery.GenerateFilterCondition( "RowKey", QueryComparisons.GreaterThanOrEqual, $"Package|" ),
+                    TableOperators.And,
+                    TableQuery.GenerateFilterCondition( "RowKey", QueryComparisons.LessThan, $"Package||" ) );
+
+            TableQuery<PackageEntity> query = new TableQuery<PackageEntity>().Where( filter );
+            TableContinuationToken continuationToken = null;
+            List<Package> result = new List<Package>();
+            do
+            {
+                TableQuerySegment<PackageEntity> s = await PackageTable.ExecuteQuerySegmentedAsync( query, continuationToken );
+                continuationToken = s.ContinuationToken;
+                foreach( PackageEntity e in s.Results ) result.Add( await PackageEntityToPackage( e ) );
+            } while( continuationToken != null );
+            return result;
+        }
+
+        public Task<IEnumerable<VPackageId>> GetNotCrawledVPackageIds( PackageSegment segment )
+        {
+            return GetIds<VPackageEntity, VPackageId>(
+                segment,
+                "NotCrawledVPackage",
+                i =>
+                {
+                    string[] keyParts = i.RowKey.Split( '|' );
+                    return new VPackageId( segment.PackageManager, keyParts[ 1 ], keyParts[ 2 ] );
+                } );
+        }
+
+        public Task<IEnumerable<PackageId>> GetPackageIds( PackageSegment segment )
+        {
+            return GetIds<PackageEntity, PackageId>(
+                segment,
+                "Package",
+                i =>
+                {
+                    string[] keyParts = i.RowKey.Split( '|' );
+                    return new PackageId( segment.PackageManager, keyParts[ 1 ] );
+                } );
+        }
+
+        public Task<IEnumerable<VPackageId>> GetVPackageIds( PackageSegment segment )
+        {
+            return GetIds<VPackageEntity, VPackageId>(
+                segment,
+                "VPackage",
+                i =>
+                {
+                    string[] keyParts = i.RowKey.Split( '|' );
+                    return new VPackageId( segment.PackageManager, keyParts[ 1 ], keyParts[ 2 ] );
+                } );
+        }
+
+        async Task<IEnumerable<TResult>> GetIds<T, TResult>( PackageSegment segment, string rowKeyPrefix, Func<T, TResult> map )
+            where T : ITableEntity, new()
+        {
+            string filter = TableQuery.CombineFilters(
+                    TableQuery.GenerateFilterCondition( "PartitionKey", QueryComparisons.Equal, segment.PackageManager ),
+                    TableOperators.And,
+                    TableQuery.GenerateFilterCondition( "RowKey", QueryComparisons.GreaterThanOrEqual, $"{rowKeyPrefix}|{segment.Start}" ) );
+
+            if( segment.HasEnd )
+            {
+                filter = TableQuery.CombineFilters(
+                    filter,
+                    TableOperators.And,
+                    TableQuery.GenerateFilterCondition( "RowKey", QueryComparisons.LessThan, $"{rowKeyPrefix}|{segment.End}" ) );
+            }
+            else
+            {
+                filter = TableQuery.CombineFilters(
+                    filter,
+                    TableOperators.And,
+                    TableQuery.GenerateFilterCondition( "RowKey", QueryComparisons.LessThan, $"{rowKeyPrefix}||" ) );
+            }
+            TableQuery<T> query = new TableQuery<T>().Where( filter );
+            TableContinuationToken continuationToken = null;
+            List<TResult> result = new List<TResult>();
+            do
+            {
+                TableQuerySegment<T> s = await PackageTable.ExecuteQuerySegmentedAsync( query, continuationToken );
+                continuationToken = s.ContinuationToken;
+                result.AddRange( s.Results.Select( r => map( r ) ) );
+            } while( continuationToken != null );
+            return result;
+        }
+
+        public Task UpdateLastPreRelease( PackageId id, VPackageId lastPreReleaseId )
+        {
+            return UpdateLastRelease( id, e => e.LastPreRelease = lastPreReleaseId.Version );
+        }
+
+        public Task UpdateLastRelease( PackageId id, VPackageId lastReleaseId )
+        {
+            return UpdateLastRelease( id, e => e.LastRelease = lastReleaseId.Version );
+        }
+
+        async Task UpdateLastRelease( PackageId id, Action<PackageEntity> update )
+        {
+            TableOperation retrieveOperation = TableOperation.Retrieve<PackageEntity>( id.PackageManager, $"Package|{id.Value}" );
+            TableResult tableResult = await PackageTable.ExecuteAsync( retrieveOperation );
+            PackageEntity entity = ( PackageEntity )tableResult.Result;
+            if( entity != null )
+            {
+                update( entity );
+                TableOperation updateOperation = TableOperation.Replace( entity );
+                await PackageTable.ExecuteAsync( updateOperation );
+            }
         }
 
         public async Task<Package> GetPackageById( PackageId packageId )
         {
-            TableOperation operation = TableOperation.Retrieve<PackageEntity>( "NuGet", $"{packageId.Id}" );
-            TableResult result = await PackageTable.ExecuteAsync( operation );
-            if( result.Result == null ) return null;
-            return ( ( PackageEntity )result.Result ).ToPackage();
+            TableOperation retrieve = TableOperation.Retrieve<PackageEntity>( packageId.PackageManager, $"Package|{packageId.Value}" );
+            TableResult tableResult = await PackageTable.ExecuteAsync( retrieve );
+            PackageEntity entity = ( PackageEntity )tableResult.Result;
+            if( entity == null ) return null;
+
+            return await PackageEntityToPackage( entity );
         }
 
-        public async Task<VPackage> GetVPackageById( VPackageId vPackageId )
+        async Task<Package> PackageEntityToPackage( PackageEntity entity )
         {
-            TableOperation operation = TableOperation.Retrieve<VPackageEntity>( "NuGet", $"{vPackageId.Id}_{vPackageId.Version}" );
-            TableResult result = await VPackageTable.ExecuteAsync( operation );
-            if( result.Result == null ) return null;
-            return ( ( VPackageEntity )result.Result ).ToVPackage();
+            string[] keyParts = entity.RowKey.Split( '|' );
+            VPackage lastRelease = string.IsNullOrWhiteSpace( entity.LastRelease ) ? null : await GetVPackageById( new VPackageId( entity.PartitionKey, keyParts[ 1 ], entity.LastRelease ) );
+            VPackage lastPreRelease = string.IsNullOrWhiteSpace( entity.LastPreRelease ) ? null : await GetVPackageById( new VPackageId( entity.PartitionKey, keyParts[ 1 ], entity.LastPreRelease ) );
+            return new Package( new PackageId( entity.PartitionKey, keyParts[ 1 ] ), lastRelease, lastPreRelease );
         }
 
-        public async Task<IReadOnlyCollection<PackageId>> GetRootPackages()
+        async Task<VPackage> GetVPackageById( VPackageId vPackageId )
         {
-            TableQuery<RootPackageEntity> query = new TableQuery<RootPackageEntity>()
-                .Where( TableQuery.GenerateFilterCondition( "PartitionKey", QueryComparisons.Equal, "NuGet" ) );
-            TableContinuationToken continuationToken = null;
-            List<PackageId> result = new List<PackageId>();
-            do
+            TableOperation retrieve = TableOperation.Retrieve<VPackageEntity>( vPackageId.PackageManager, $"VPackage|{vPackageId.Id}|{vPackageId.Version}" );
+            TableResult tableResult = await PackageTable.ExecuteAsync( retrieve );
+            VPackageEntity entity = ( VPackageEntity )tableResult.Result;
+            if( entity == null ) return null;
+
+            if( string.IsNullOrWhiteSpace( entity.Dependencies ) ) return new VPackage( vPackageId );
+
+            List<VPackage> dependencies = new List<VPackage>();
+            foreach( VPackageId dependency in Deserialize( entity.Dependencies ) )
             {
-                TableQuerySegment<RootPackageEntity> segment = await RootPackageTable.ExecuteQuerySegmentedAsync( query, continuationToken );
-                continuationToken = segment.ContinuationToken;
-                result.AddRange( segment.Results.Select( e => new PackageId( e.RowKey ) ) );
-            } while( continuationToken != null );
+                VPackage vPackage = await GetVPackageById( dependency );
+                if( vPackage != null ) dependencies.Add( vPackage );
+            }
 
-            return result;
+            return new VPackage( vPackageId, dependencies );
         }
 
-        CloudStorageAccount _storageAccount;
-        CloudStorageAccount StorageAccount
+        CloudStorageAccount _cloudStorageAccount;
+        CloudStorageAccount CloudStorageAccount
         {
-            get { return _storageAccount ?? ( _storageAccount = CloudStorageAccount.Parse( _connectionString ) ); }
+            get { return _cloudStorageAccount ?? ( _cloudStorageAccount = CloudStorageAccount.Parse( _connectionString ) ); }
         }
 
-        CloudTableClient _tableClient;
-        CloudTableClient TableClient
+        CloudTableClient _cloudTableClient;
+        CloudTableClient CloudTableClient
         {
-            get { return _tableClient ?? ( _tableClient = StorageAccount.CreateCloudTableClient() ); }
+            get { return _cloudTableClient ?? ( _cloudTableClient = CloudStorageAccount.CreateCloudTableClient() ); }
         }
 
         CloudTable _packageTable;
         CloudTable PackageTable
         {
-            get { return _packageTable ?? ( _packageTable = TableClient.GetTableReference( "Package" ) ); }
+            get { return _packageTable ?? ( _packageTable = CloudTableClient.GetTableReference( _tableName ) ); }
         }
 
-        CloudTable _vPackageTable;
-        CloudTable VPackageTable
+        static IReadOnlyCollection<VPackageId> Deserialize( string dependencies )
         {
-            get { return _vPackageTable ?? ( _vPackageTable = TableClient.GetTableReference( "VPackage" ) ); }
-        }
-
-        CloudTable _rootPackageTable;
-        CloudTable RootPackageTable
-        {
-            get { return _rootPackageTable ?? ( _rootPackageTable = TableClient.GetTableReference( "RootPackage" ) ); }
-        }
-
-        public class VPackageEntity : TableEntity
-        {
-            public VPackageEntity( VPackage vPackage )
-                : this()
-            {
-                PartitionKey = "NuGet";
-                RowKey = $"{vPackage.VPackageId.Id}_{vPackage.VPackageId.Version}";
-                Value = vPackage.ToXml();
-            }
-
-            public VPackageEntity()
-            {
-            }
-
-            public string Value { get; set; }
-
-            internal VPackage ToVPackage()
-            {
-                return Value.ToVPackage();
-            }
+            return XElement.Parse( dependencies )
+                .Descendants()
+                .Select( d => new VPackageId(
+                     d.Attribute( "PackageManager" ).Value,
+                     d.Attribute( "Id" ).Value,
+                     d.Attribute( "Version" ).Value ) )
+                .ToList();
         }
 
         public class PackageEntity : TableEntity
         {
-            public PackageEntity( Package package )
-            {
-                PartitionKey = "NuGet";
-                RowKey = package.Name;
-                LastRelease = package.LastRelease.ToXml();
-                LastPreRelease = package.LastPreRelease.ToXml();
-                IsNotFound = package.IsNotFound;
-            }
-
             public PackageEntity()
             {
+            }
+
+            public PackageEntity( PackageId packageId )
+            {
+                PartitionKey = packageId.PackageManager;
+                RowKey = $"Package|{packageId.Value}";
             }
 
             public string LastRelease { get; set; }
 
             public string LastPreRelease { get; set; }
-
-            public bool IsNotFound { get; set; }
-
-            internal Package ToPackage()
-            {
-                return new Package( RowKey, LastRelease.ToVPackage(), LastPreRelease.ToVPackage(), IsNotFound );
-            }
         }
 
-        class RootPackageEntity : TableEntity
+        public class VPackageEntity : TableEntity
         {
-            public RootPackageEntity( PackageId packageId )
-            {
-                PartitionKey = "NuGet";
-                RowKey = packageId.Id;
-            }
-
-            public RootPackageEntity()
+            public VPackageEntity()
             {
             }
-        }
-    }
 
-    internal static class VPackageExtensions
-    {
-        internal static string ToXml( this VPackage @this )
-        {
-            if( @this == null ) return string.Empty;
-            XDocument xDocument = new XDocument(
-                new XElement( "VPackage",
-                    new XAttribute( "Id", @this.VPackageId.Id ),
-                    new XAttribute( "Version", @this.VPackageId.Version ),
-                    new XAttribute( "IsNotFound", @this.IsNotFound ),
-                    new XElement(
-                        "Dependencies",
-                        @this.Dependencies.Select(
-                            d => new XElement(
-                                "Dependency",
-                                new XAttribute( "Id", d.Id ),
-                                new XAttribute( "Version", d.Version ) ) ) ) ) );
-            return xDocument.ToString();
-        }
-    }
+            public VPackageEntity( VPackageId vPackageId )
+            {
+                PartitionKey = vPackageId.PackageManager;
+                RowKey = $"VPackage|{vPackageId.Id}|{vPackageId.Version}";
+            }
 
-    internal static class StringExtensions
-    {
-        internal static VPackage ToVPackage( this string @this )
+            public string Dependencies { get; set; }
+        }
+
+        public class NotCrawledVPackageEntity : TableEntity
         {
-            if( @this == null || @this == string.Empty ) return null;
-            XElement xElement = XElement.Parse( @this );
-            VPackageId vPackageId = new VPackageId( xElement.Attribute( "Id" ).Value, xElement.Attribute( "Version" ).Value );
-            bool isNotFound = bool.Parse( xElement.Attribute( "IsNotFound" ).Value );
-            IReadOnlyCollection<VPackageId> dependencies = xElement.Element( "Dependencies" )
-                .Elements()
-                .Select( x => new VPackageId(
-                     x.Attribute( "Id" ).Value,
-                     x.Attribute( "Version" ).Value ) )
-                .ToList();
-            return new VPackage( vPackageId, dependencies, isNotFound );
+            public NotCrawledVPackageEntity()
+            {
+            }
+
+            public NotCrawledVPackageEntity( VPackageId vPackageId )
+            {
+                PartitionKey = vPackageId.PackageManager;
+                RowKey = $"NotCrawledVPackage|{vPackageId.Id}|{vPackageId.Version}";
+            }
         }
     }
 }

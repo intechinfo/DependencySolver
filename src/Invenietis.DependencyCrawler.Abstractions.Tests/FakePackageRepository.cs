@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Invenietis.DependencyCrawler.Core;
 
@@ -7,67 +8,113 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
 {
     class FakePackageRepository : IPackageRepository
     {
-        readonly Dictionary<string, Package> _packages;
-        readonly Dictionary<VPackageId, VPackage> _vPackages;
-        IReadOnlyCollection<PackageId> _rootPackages;
+        readonly Dictionary<PackageId, Tuple<VPackageId, VPackageId>> _packages;
+        readonly Dictionary<VPackageId, HashSet<VPackageId>> _vPackages;
 
         internal FakePackageRepository()
         {
-            _packages = new Dictionary<string, Package>();
-            _vPackages = new Dictionary<VPackageId, VPackage>();
+            _packages = new Dictionary<PackageId, Tuple<VPackageId, VPackageId>>();
+            _vPackages = new Dictionary<VPackageId, HashSet<VPackageId>>();
         }
 
 #pragma warning disable 1998
 
-        public async Task AddOrUpdatePackage( Package package )
+        public async Task<bool> AddIfNotExists( PackageId packageId )
         {
-            _packages[ package.Name ] = package;
+            if( !_packages.ContainsKey( packageId ) )
+            {
+                _packages[ packageId ] = null;
+                return true;
+            }
+
+            return false;
         }
 
-        public async Task AddOrUpdateVPackage( VPackage vPackage )
+        public async Task<bool> AddIfNotExists( VPackageId vPackageId )
         {
-            _vPackages.Add( vPackage.VPackageId, vPackage );
+            if( !_vPackages.ContainsKey( vPackageId ) )
+            {
+                _vPackages[ vPackageId ] = null;
+                return true;
+            }
+
+            return false;
         }
 
-        public async Task<bool> ExistsVPackage( VPackageId vPackageId )
+        public async Task AddDependenciesIfNotExists( VPackageId vPackageId, IEnumerable<VPackageId> dependencies )
         {
-            return _vPackages.ContainsKey( vPackageId );
+            if( _vPackages[ vPackageId ] == null )
+            {
+                _vPackages[ vPackageId ] = new HashSet<VPackageId>( dependencies );
+            }
         }
 
         public async Task<IEnumerable<Package>> GetAllPackages()
         {
-            return _packages.Values;
+            List<Package> result = new List<Package>();
+            foreach( var packageId in _packages.Keys )
+            {
+                result.Add( GetPackage( packageId ) );
+            }
+
+            return result;
         }
 
-        public async Task<IEnumerable<VPackage>> GetAllVPackages()
+        Package GetPackage( PackageId packageId )
         {
-            return _vPackages.Values;
+            var lastReleases = _packages[ packageId ];
+            VPackage lastRelease = GetVPackage( lastReleases.Item1 );
+            VPackage lastPreRelease = GetVPackage( lastReleases.Item2 );
+
+            return new Package( packageId, lastRelease, lastPreRelease );
+        }
+
+        VPackage GetVPackage( VPackageId packageId )
+        {
+            if( packageId == null ) return null;
+
+            HashSet<VPackageId> dependencies = _vPackages[ packageId ];
+            if( dependencies.Count == 0 ) return new VPackage( packageId );
+
+            List<VPackage> vPackages = new List<VPackage>();
+            foreach( VPackageId dependency in dependencies ) vPackages.Add( GetVPackage( dependency ) );
+
+            return new VPackage( packageId, vPackages );
+        }
+
+        public async Task<IEnumerable<VPackageId>> GetNotCrawledVPackageIds( PackageSegment segment )
+        {
+            return _vPackages.Where( kv => kv.Value == null ).Select( kv => kv.Key );
+        }
+
+        public async Task<IEnumerable<PackageId>> GetPackageIds( PackageSegment segment )
+        {
+            return _packages.Select( kv => kv.Key );
+        }
+
+        public async Task UpdateLastRelease( PackageId id, VPackageId lastReleaseId )
+        {
+            Tuple<VPackageId, VPackageId> currentLastReleases = _packages[ id ];
+            _packages[ id ] = Tuple.Create( lastReleaseId, currentLastReleases == null ? null : currentLastReleases.Item2 );
+        }
+
+        public async Task UpdateLastPreRelease( PackageId id, VPackageId lastPreReleaseId )
+        {
+            Tuple<VPackageId, VPackageId> currentLastReleases = _packages[ id ];
+            _packages[ id ] = Tuple.Create( currentLastReleases == null ? null : currentLastReleases.Item1, lastPreReleaseId );
+        }
+
+        public async Task<IEnumerable<VPackageId>> GetVPackageIds( PackageSegment segment )
+        {
+            return _vPackages.Keys;
         }
 
         public async Task<Package> GetPackageById( PackageId packageId )
         {
-            Package result;
-            _packages.TryGetValue( packageId.Id, out result );
-            return result;
-        }
-
-        public async Task<IReadOnlyCollection<PackageId>> GetRootPackages()
-        {
-            return _rootPackages;
-        }
-
-        public async Task<VPackage> GetVPackageById( VPackageId vPackageId )
-        {
-            VPackage result;
-            _vPackages.TryGetValue( vPackageId, out result );
-            return result;
+            return GetPackage( packageId );
         }
 
 #pragma warning restore 1998
 
-        internal void SetRootPackages(IReadOnlyCollection<PackageId> rootPackages)
-        {
-            _rootPackages = rootPackages;
-        }
     }
 }

@@ -6,16 +6,24 @@ namespace Invenietis.DependencyCrawler.Abstractions
 {
     public interface IPackageRepository
     {
-        Task<bool> ExistsVPackage( VPackageId vPackageId );
+        Task<IEnumerable<PackageId>> GetPackageIds( PackageSegment segment );
 
-        Task AddOrUpdatePackage( Package package );
+        Task<IEnumerable<VPackageId>> GetVPackageIds( PackageSegment segment );
+
+        Task<IEnumerable<VPackageId>> GetNotCrawledVPackageIds( PackageSegment segment );
+
+        Task<bool> AddIfNotExists( VPackageId vPackageId );
+
+        Task<bool> AddIfNotExists( PackageId vPackageId );
+
+        Task UpdateLastRelease( PackageId id, VPackageId lastReleaseId );
+
+        Task UpdateLastPreRelease( PackageId id, VPackageId lastPreReleaseId );
+
+        Task<IEnumerable<Package>> GetAllPackages();
+
+        Task AddDependenciesIfNotExists( VPackageId vPackageId, IEnumerable<VPackageId> dependencies );
 
         Task<Package> GetPackageById( PackageId packageId );
-
-        Task AddOrUpdateVPackage( VPackage vPackage );
-
-        Task<VPackage> GetVPackageById( VPackageId lastPreRelease );
-
-        Task<IReadOnlyCollection<PackageId>> GetRootPackages();
     }
 }
