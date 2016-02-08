@@ -19,7 +19,10 @@ namespace Invenietis.DependencyCrawler.Tests
                 .Build();
             string connectionString = configuration[ "Data:AzureStorage:ConnectionString" ];
             string packageTable = configuration[ "Data:AzureStorage:PackageTable" ];
-            return new AzureTablePackageRepository( connectionString, packageTable );
+            string vPackageTable = configuration[ "Data:AzureStorage:VPackageTable" ];
+            string notCrawledVPackageTable = configuration[ "Data:AzureStorage:NotCrawledVPackageTable" ];
+            string vPackageCacheBlobContainer = configuration[ "Data:AzureStorage:VPackageCacheBlobContainer" ];
+            return new AzureTablePackageRepository( connectionString, packageTable, vPackageTable, notCrawledVPackageTable, vPackageCacheBlobContainer );
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
 
             await sut.AddIfNotExists( vPackageId );
 
-            IEnumerable<VPackageId> vPackageIds = await sut.GetVPackageIds( new PackageSegment( "Test", vPackageId.Id ) );
+            IEnumerable<VPackageId> vPackageIds = await sut.GetNotCrawledVPackageIds( new PackageSegment( "Test", vPackageId.Id ) );
             Assert.That( vPackageIds, Contains.Item( vPackageId ) );
         }
 
@@ -88,6 +88,7 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             await sut.AddIfNotExists( packageId );
             VPackageId lastRelease = new VPackageId( "Test", packageId.Value, "1.0.0" );
             await sut.AddIfNotExists( lastRelease );
+            await sut.AddDependenciesIfNotExists( lastRelease, new VPackageId[ 0 ] );
 
             await sut.UpdateLastRelease( packageId, lastRelease );
 
@@ -106,6 +107,7 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             await sut.AddIfNotExists( packageId );
             VPackageId lastPreRelease = new VPackageId( "Test", packageId.Value, "2.0.0-alpha" );
             await sut.AddIfNotExists( lastPreRelease );
+            await sut.AddDependenciesIfNotExists( lastPreRelease, new VPackageId[ 0 ] );
 
             await sut.UpdateLastPreRelease( packageId, lastPreRelease );
 
@@ -118,7 +120,7 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
         }
 
         [Test]
-        public async Task AddDependenciesIfNotExists_With2Depedencies_ShouldAddThis2Dependencies()
+        public async Task AddDependenciesIfNotExists_With2Dependencies_ShouldAddThis2Dependencies()
         {
             IPackageRepository sut = CreatePackageRepository();
             PackageId packageId = new PackageId( "Test", Guid.NewGuid().ToString() );
@@ -133,6 +135,9 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             VPackageId dependencyId2 = new VPackageId( "Test", Guid.NewGuid().ToString(), "1.0.0" );
             IEnumerable<VPackageId> dependencyIds = new[] { dependencyId1, dependencyId2 };
 
+            await sut.AddDependenciesIfNotExists( dependencyId1, new VPackageId[ 0 ] );
+            await sut.AddDependenciesIfNotExists( dependencyId2, new VPackageId[ 0 ] );
+            await sut.AddDependenciesIfNotExists( lastPreRelease, new VPackageId[ 0 ] );
             await sut.AddDependenciesIfNotExists( lastRelease, dependencyIds );
 
             Package package = await sut.GetPackageById( packageId );

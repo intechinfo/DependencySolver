@@ -20,6 +20,7 @@ namespace CodeCake
         public Build()
         {
             DNXSolution dnxSolution = null;
+            IEnumerable<DNXProjectFile> projectsToPack = null;
             IEnumerable<DNXProjectFile> projectsToPublish = null;
             SimpleRepositoryInfo gitInfo = null;
             string configuration = null;
@@ -28,7 +29,8 @@ namespace CodeCake
             {
                 dnxSolution = Cake.GetDNXSolution( p => p.ProjectName != "CodeCakeBuilder" );
                 if( !dnxSolution.IsValid ) throw new Exception( "Unable to initialize solution." );
-                projectsToPublish = dnxSolution.Projects.Where( p => !p.ProjectName.EndsWith( ".Tests" ) );
+                projectsToPack = dnxSolution.Projects.Where( p => !p.ProjectName.EndsWith( ".Tests" ) );
+                projectsToPublish = dnxSolution.Projects.Where( p => p.ProjectName == "Invenietis.DependencyCrawler.Hosts.Crawler" );
             } );
 
             Teardown( () =>
@@ -51,10 +53,10 @@ namespace CodeCake
                     }
                     configuration = gitInfo.IsValidRelease && gitInfo.PreReleaseName.Length == 0 ? "Release" : "Debug";
                     Cake.Information( "Publishing {0} projects with version={1} and configuration={2}: {3}",
-                        projectsToPublish.Count(),
+                        projectsToPack.Count(),
                         gitInfo.SemVer,
                         configuration,
-                        string.Join( ", ", projectsToPublish.Select( p => p.ProjectName ) ) );
+                        string.Join( ", ", projectsToPack.Select( p => p.ProjectName ) ) );
                 } );
 
             Task( "Set-ProjectVersion" )
@@ -89,7 +91,7 @@ namespace CodeCake
                     {
                         c.GeneratePackage = true;
                         c.Configurations.Add( configuration );
-                        c.ProjectPaths.UnionWith( projectsToPublish.Select( p => p.ProjectDir ) );
+                        c.ProjectPaths.UnionWith( projectsToPack.Select( p => p.ProjectDir ) );
                         c.Quiet = true;
                     } );
                 } );
@@ -103,7 +105,8 @@ namespace CodeCake
                     {
                         foreach( var framework in p.Frameworks )
                         {
-                            Cake.DNXRun( c => {
+                            Cake.DNXRun( c =>
+                            {
                                 c.Arguments = "test";
                                 c.Configuration = configuration;
                                 c.Framework = framework;
@@ -113,8 +116,24 @@ namespace CodeCake
                     }
                 } );
 
+            Task( "Publish" )
+                .IsDependentOn( "Unit-Testing" )
+                .Does( () =>
+                {
+                    foreach( string projectFilePath in projectsToPublish.Select( p => p.ProjectFilePath ) )
+                    {
+                        Cake.DNUPublish( s =>
+                        {
+                            s.NoSource = true;
+                            s.ProjectPaths.Add( projectFilePath );
+                            s.Configurations.Add( configuration );
+                            s.Quiet = true;
+                        } );
+                    }
+                } );
+
             // The Default task for this script can be set here.
-            Task( "Default" ).IsDependentOn( "Unit-Testing" );
+            Task( "Default" ).IsDependentOn( "Publish" );
         }
     }
 }

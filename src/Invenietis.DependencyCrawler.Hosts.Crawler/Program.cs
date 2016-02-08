@@ -18,10 +18,13 @@ namespace Invenietis.DependencyCrawler.Hosts
 
             string connectionString = config[ "Data:AzureStorage:ConnectionString" ];
             string packageTable = config[ "Data:AzureStorage:PackageTable" ];
+            string vPackageTable = config[ "Data:AzureStorage:VPackageTable" ];
+            string notCrawledVPackageTable = config[ "Data:AzureStorage:NotCrawledVPackageTable" ];
+            string vPackageCacheBlobContainer = config[ "Data:AzureStorage:VPackageCacheBlobContainer" ];
             Crawler crawler = new Crawler(
                 new NuGetDownloader(
                     new FeedProvider( new[] { "http://nuget.org/api/v2/" } ) ),
-                new AzureTablePackageRepository( connectionString, packageTable ),
+                new AzureTablePackageRepository( connectionString, packageTable, vPackageTable, notCrawledVPackageTable, vPackageCacheBlobContainer ),
                 new PackageSegment( PackageId.NuGet, "A" ) );
 
             Task.Run( async () => await crawler.Start() ).Wait();
