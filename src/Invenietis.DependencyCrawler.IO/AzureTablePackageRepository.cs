@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Invenietis.DependencyCrawler.Abstractions;
 using Invenietis.DependencyCrawler.Core;
-using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -63,7 +61,7 @@ namespace Invenietis.DependencyCrawler.IO
 
             VPackageEntity vPackageEntity = new VPackageEntity( vPackageId );
             vPackageEntity.Dependencies = SerializeDependencies( dependencies );
-            TableOperation insertOperation = TableOperation.InsertOrReplace( vPackageEntity );
+            TableOperation insertOperation = TableOperation.Insert( vPackageEntity );
             await VPackageTable.ExecuteAsync( insertOperation );
 
             TableOperation deleteOperation = TableOperation.Delete( notCrawledEntity );
@@ -234,7 +232,7 @@ namespace Invenietis.DependencyCrawler.IO
         async Task CacheVPackage( VPackage vPackage )
         {
             CloudBlockBlob blob = CloudBlobContainer.GetBlockBlobReference( $"{vPackage.VPackageId.PackageManager}/{vPackage.VPackageId.Id}/{vPackage.VPackageId.Version}" );
-            string serializedVPackage = SerializeVPackage( vPackage ).ToString();
+            string serializedVPackage = PackageSerializer.Serialize( vPackage );
             await blob.UploadTextAsync( serializedVPackage );
         }
 
@@ -246,7 +244,7 @@ namespace Invenietis.DependencyCrawler.IO
 
             string serializedVPackage = await blob.DownloadTextAsync();
 
-            VPackage result = DeserializeVPackage( serializedVPackage );
+            VPackage result = PackageSerializer.DeserializeVPackage( serializedVPackage );
             return Tuple.Create( true, result );
         }
 
@@ -272,22 +270,6 @@ namespace Invenietis.DependencyCrawler.IO
                      d.Attribute( "Id" ).Value,
                      d.Attribute( "Version" ).Value ) )
                 .ToList();
-        }
-
-        XElement SerializeVPackage( VPackage vPackage )
-        {
-            return new XElement(
-                "VPackage",
-                new XAttribute( "PackageManager", vPackage.VPackageId.PackageManager ),
-                new XAttribute( "Id", vPackage.VPackageId.Id ),
-                new XAttribute( "Version", vPackage.VPackageId.Version ),
-                new XElement( "Dependencies", vPackage.Dependencies.Select( p => SerializeVPackage( p ) ) ) );
-        }
-
-        VPackage DeserializeVPackage( string vPackage )
-        {
-            XElement xElement = XElement.Parse( vPackage );
-            return DeserializeVPackage( xElement );
         }
 
         VPackage DeserializeVPackage( XElement xElement )
@@ -342,7 +324,20 @@ namespace Invenietis.DependencyCrawler.IO
             get { return _cloudBlobContainer ?? ( _cloudBlobContainer = CloudBlobClient.GetContainerReference( _vPackageCacheBlobContainerName ) ); }
         }
 
-
+        IPackageSerializer _packageSerializer;
+        IPackageSerializer PackageSerializer
+        {
+            get
+            {
+                if( _packageSerializer == null ) _packageSerializer = new XmlPackageSerializer();
+                return _packageSerializer;
+            }
+            set
+            {
+                if( _packageSerializer != null ) throw new InvalidOperationException( IOResources.DependencyAlreadyInjected );
+                _packageSerializer = value;
+            }
+        }
 
         public class PackageEntity : TableEntity
         {
