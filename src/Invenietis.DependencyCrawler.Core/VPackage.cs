@@ -8,7 +8,7 @@ namespace Invenietis.DependencyCrawler.Core
     public class VPackage
     {
         public VPackage( VPackageId vPackageId )
-            : this( vPackageId, new VPackage[ 0 ] )
+            : this( vPackageId, new Platform[ 0 ] )
         {
         }
 
@@ -17,38 +17,50 @@ namespace Invenietis.DependencyCrawler.Core
         {
         }
 
+        public VPackage( VPackageId vPackageId, IReadOnlyCollection<Platform> platforms )
+            : this( vPackageId, platforms, false )
+        {
+        }
+
         public VPackage( VPackageId vPackageId, bool isNotFound )
-            : this( vPackageId, new VPackage[ 0 ], isNotFound )
+            : this( vPackageId, new Platform[ 0 ], isNotFound )
         {
         }
 
         public VPackage( VPackageId vPackageId, IReadOnlyCollection<VPackage> dependencies, bool isNotFound )
+            : this( vPackageId, new[] { new Platform( dependencies ) }, isNotFound )
+        {
+        }
+
+        public VPackage( VPackageId vPackageId, IReadOnlyCollection<Platform> platforms, bool isNotFound )
         {
             VPackageId = vPackageId;
-            Dependencies = dependencies;
+            Platforms = platforms;
             IsNotFound = isNotFound;
         }
 
 
         public VPackageId VPackageId { get; }
 
-        public IReadOnlyCollection<VPackage> Dependencies { get; }
+        public IReadOnlyCollection<Platform> Platforms { get; }
 
         public bool IsNotFound { get; }
 
         public override bool Equals( object obj )
         {
             VPackage other = obj as VPackage;
-            return other != null
+            bool result = other != null
                 && other.VPackageId == VPackageId
                 && other.IsNotFound == IsNotFound
-                && other.Dependencies.Intersect( Dependencies ).Count() == Dependencies.Count;
+                && other.Platforms.Intersect( Platforms ).Count() == Platforms.Count;
+
+            return result;
         }
 
         public override int GetHashCode()
         {
             int hashCode = VPackageId.GetHashCode() << 3 ^ IsNotFound.GetHashCode();
-            foreach( VPackage dependency in Dependencies.OrderBy( p => p.VPackageId.Id ).ThenBy( p => p.VPackageId.Version ) )
+            foreach( Platform dependency in Platforms.OrderBy( p => p.PlatformId ) )
             {
                 hashCode = hashCode << 3 ^ dependency.GetHashCode();
             }

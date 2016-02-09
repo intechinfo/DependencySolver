@@ -13,42 +13,56 @@ namespace Invenietis.DependencyCrawler.IO
             XElement xElement = XElement.Parse( serializedVPackage );
             VPackageId vPackageId = VPackageIdFromXElement( xElement );
 
-            Dictionary<VPackageId, IEnumerable<VPackageId>> dependencies =
+            Dictionary<VPackageId, Dictionary<PlatformId, IEnumerable<VPackageId>>> platforms =
                 xElement.Elements( "VPackageInfo" )
-                        .Select( x => new { PackageId = VPackageIdFromXElement( x ), Dependencies = DependenciesFromXElement( x ) } )
-                        .ToDictionary( x => x.PackageId, x => x.Dependencies );
+                    .Select( x => new
+                    {
+                        PackageId = VPackageIdFromXElement( x ),
+                        Platforms = PlatformsFromXElement( x )
+                    } )
+                    .ToDictionary( x => x.PackageId, x => x.Platforms );
 
-            return BuildVPackage( vPackageId, dependencies );
+            return BuildVPackage( vPackageId, platforms );
         }
 
-        VPackage BuildVPackage( VPackageId vPackageId, Dictionary<VPackageId, IEnumerable<VPackageId>> dependenciesDict )
+        VPackage BuildVPackage(
+            VPackageId vPackageId,
+            Dictionary<VPackageId, Dictionary<PlatformId, IEnumerable<VPackageId>>> dependenciesDict )
         {
             return BuildVPackage( vPackageId, dependenciesDict, new Dictionary<VPackageId, VPackage>() );
         }
 
         VPackage BuildVPackage(
             VPackageId vPackageId,
-            Dictionary<VPackageId, IEnumerable<VPackageId>> dependenciesDict,
+            Dictionary<VPackageId, Dictionary<PlatformId, IEnumerable<VPackageId>>> dependenciesDict,
             Dictionary<VPackageId, VPackage> cache )
         {
             VPackage cached;
             if( cache.TryGetValue( vPackageId, out cached ) ) return cached;
 
-            IReadOnlyCollection<VPackage> dependencies =
-                dependenciesDict[ vPackageId ].Select( x => BuildVPackage( x, dependenciesDict, cache ) )
-                                              .ToList();
+            IReadOnlyCollection<Platform> platforms =
+                dependenciesDict[ vPackageId ]
+                    .Select( x => new Platform( x.Key, x.Value.Select( p => BuildVPackage( p, dependenciesDict, cache ) )
+                    .ToList() ) ).ToList();
 
-            VPackage result = new VPackage( vPackageId, dependencies );
+            VPackage result = new VPackage( vPackageId, platforms );
             cache.Add( vPackageId, result );
             return result;
         }
 
-        IEnumerable<VPackageId> DependenciesFromXElement( XElement xElement )
+        Dictionary<PlatformId, IEnumerable<VPackageId>> PlatformsFromXElement( XElement xElement )
         {
-            return xElement.Element( "Dependencies" ).Elements( "Dependency" ).Select( VPackageIdFromXElement );
+            return xElement
+                .Elements( "Platform" )
+                .Select( x => new
+                {
+                    Id = new PlatformId( x.Attribute( "Id" ).Value ),
+                    Dependencies = x.Elements( "Dependency" ).Select( VPackageIdFromXElement )
+                } )
+                .ToDictionary( x => x.Id, x => x.Dependencies );
         }
 
-        VPackageId VPackageIdFromXElement(XElement xElement)
+        VPackageId VPackageIdFromXElement( XElement xElement )
         {
             return new VPackageId(
                 xElement.Attribute( "PackageManager" ).Value,
@@ -73,38 +87,70 @@ namespace Invenietis.DependencyCrawler.IO
                 new XAttribute( "PackageManager", vPackage.VPackageId.PackageManager ),
                 new XAttribute( "Id", vPackage.VPackageId.Id ),
                 new XAttribute( "Version", vPackage.VPackageId.Version ),
-                new XElement( "Dependencies", XDependenciesFromVPackage( vPackage ) ) );
+                XPlatformsFromVPackage( vPackage ) );
         }
 
         IEnumerable<XElement> XVPackageInfosFromVPackage( VPackage vPackage )
         {
             Dictionary<VPackageId, VPackage> toSerialize = new Dictionary<VPackageId, VPackage>();
 
-            Action<VPackage> fill = null;
-            fill = p =>
+            Action<VPackage> fillVPackage = null;
+            fillVPackage = p =>
             {
                 if( !toSerialize.ContainsKey( p.VPackageId ) )
                 {
                     toSerialize.Add( p.VPackageId, p );
-                    foreach( VPackage dependency in p.Dependencies )
+                    foreach( Platform platform in p.Platforms )
                     {
-                        fill( dependency );
+                        foreach( VPackage vp in platform.VPackages ) fillVPackage( vp );
                     }
                 }
             };
 
-            fill( vPackage );
+            fillVPackage( vPackage );
 
             return toSerialize.Select( x => XPackageInfoFromVPackage( x.Value ) );
         }
 
-        IEnumerable<XElement> XDependenciesFromVPackage( VPackage vPackage )
+        IEnumerable<XElement> XPlatformsFromVPackage( VPackage vPackage )
         {
-            return vPackage.Dependencies.Select( d =>
-                new XElement( "Dependency",
-                    new XAttribute( "PackageManager", d.VPackageId.PackageManager ),
-                    new XAttribute( "Id", d.VPackageId.Id ),
-                    new XAttribute( "Version", d.VPackageId.Version ) ) );
+            return vPackage.Platforms.Select( p => new XElement( "Platform",
+                new XAttribute( "Id", p.PlatformId.Value ),
+                p.VPackages.Select( v => new XElement( "Dependency",
+                    new XAttribute( "PackageManager", v.VPackageId.PackageManager ),
+                    new XAttribute( "Id", v.VPackageId.Id ),
+                    new XAttribute( "Version", v.VPackageId.Version ) ) ) ) );
+        }
+
+        public string Serialize( IReadOnlyDictionary<PlatformId, IEnumerable<VPackageId>> dependencies )
+        {
+            if( dependencies == null ) dependencies = new Dictionary<PlatformId, IEnumerable<VPackageId>>();
+            return new XElement(
+                "Platforms",
+                dependencies.Select( d => new XElement(
+                     "Platform",
+                     new XAttribute( "Id", d.Key.Value ),
+                     d.Value.Select( x => new XElement(
+                         "Dependency",
+                         new XAttribute( "PackageManager", x.PackageManager ),
+                         new XAttribute( "Id", x.Id ),
+                         new XAttribute( "Version", x.Version ) ) ) ) ) ).ToString();
+        }
+
+        public IReadOnlyDictionary<PlatformId, IEnumerable<VPackageId>> DeserializeVPackageDependencies( string serializedVPackageDependencies )
+        {
+            return XElement.Parse( serializedVPackageDependencies )
+                .Elements( "Platform" )
+                .Select( x => new
+                {
+                    Id = new PlatformId( x.Attribute( "Id" ).Value ),
+                    VPackageIds = x.Elements( "Dependency" )
+                                    .Select( d => new VPackageId(
+                                        d.Attribute( "PackageManager" ).Value,
+                                        d.Attribute( "Id" ).Value,
+                                        d.Attribute( "Version" ).Value ) )
+                } )
+                .ToDictionary( x => x.Id, x => x.VPackageIds );
         }
     }
 }

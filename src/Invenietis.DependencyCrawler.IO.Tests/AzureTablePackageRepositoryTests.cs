@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Invenietis.DependencyCrawler.Abstractions;
+﻿using Invenietis.DependencyCrawler.Abstractions;
 using Invenietis.DependencyCrawler.Abstractions.Tests;
-using Invenietis.DependencyCrawler.Core;
 using Invenietis.DependencyCrawler.IO;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;

@@ -50,12 +50,13 @@ namespace Invenietis.DependencyCrawler.IO
 
             if( package == null ) return null;
 
-            PackageDependencyEqualityComparer comparer = new PackageDependencyEqualityComparer();
-            List<VPackageId> dependencies = package.DependencySets
-                .SelectMany( s => s.Dependencies )
-                .Distinct( comparer )
-                .Select( d => new VPackageId( PackageId.NuGet, d.Id, d.VersionSpec.MinVersion.ToString() ) )
-                .ToList();
+            var dependencies = package.DependencySets
+                .Select( s => new
+                {
+                    PlatformId = new PlatformId( s.TargetFramework.FullName ),
+                    VPackageIds = s.Dependencies.Select( d => new VPackageId( PackageId.NuGet, d.Id, d.VersionSpec.MinVersion.ToString() ) )
+                } )
+                .ToDictionary( x => x.PlatformId, x => x.VPackageIds );
 
             return new PackageInfo( vPackageInfo, dependencies );
         }

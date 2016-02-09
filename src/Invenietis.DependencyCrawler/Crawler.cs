@@ -65,11 +65,22 @@ namespace Invenietis.DependencyCrawler
         async Task Crawl( VPackageId vPackageId )
         {
             PackageInfo packageInfo = await PackageDownloader.GetPackage( vPackageId );
-            foreach( VPackageId dependencyId in packageInfo.Dependencies )
+            bool added;
+            IEnumerable<PackageId> packageIdsToTrack = packageInfo.Dependencies
+                .SelectMany( kv => kv.Value )
+                .Select( x => new PackageId( x.PackageManager, x.Id ) )
+                .Distinct();
+            foreach( PackageId packageId in packageIdsToTrack )
             {
-                bool added = await PackageRepository.AddIfNotExists( new PackageId( dependencyId.PackageManager, dependencyId.Id ) );
+                added = await PackageRepository.AddIfNotExists( packageId );
                 _newItemsFound = _newItemsFound || added;
-                added = await PackageRepository.AddIfNotExists( dependencyId );
+            }
+            IEnumerable<VPackageId> vPackageIdsToTrack = packageInfo.Dependencies
+                .SelectMany( kv => kv.Value )
+                .Distinct();
+            foreach( VPackageId vPackageIdToTrack in vPackageIdsToTrack )
+            {
+                added = await PackageRepository.AddIfNotExists( vPackageIdToTrack );
                 _newItemsFound = _newItemsFound || added;
             }
             await PackageRepository.AddDependenciesIfNotExists( vPackageId, packageInfo.Dependencies );

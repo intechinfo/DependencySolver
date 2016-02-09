@@ -9,12 +9,12 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
     class FakePackageRepository : IPackageRepository
     {
         readonly Dictionary<PackageId, Tuple<VPackageId, VPackageId>> _packages;
-        readonly Dictionary<VPackageId, HashSet<VPackageId>> _vPackages;
+        readonly Dictionary<VPackageId, IReadOnlyDictionary<PlatformId, IEnumerable<VPackageId>>> _vPackages;
 
         internal FakePackageRepository()
         {
             _packages = new Dictionary<PackageId, Tuple<VPackageId, VPackageId>>();
-            _vPackages = new Dictionary<VPackageId, HashSet<VPackageId>>();
+            _vPackages = new Dictionary<VPackageId, IReadOnlyDictionary<PlatformId, IEnumerable<VPackageId>>>();
         }
 
 #pragma warning disable 1998
@@ -41,11 +41,11 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             return false;
         }
 
-        public async Task AddDependenciesIfNotExists( VPackageId vPackageId, IEnumerable<VPackageId> dependencies )
+        public async Task AddDependenciesIfNotExists( VPackageId vPackageId, IReadOnlyDictionary<PlatformId, IEnumerable<VPackageId>> dependencies )
         {
             if( _vPackages[ vPackageId ] == null )
             {
-                _vPackages[ vPackageId ] = new HashSet<VPackageId>( dependencies );
+                _vPackages[ vPackageId ] = dependencies;
             }
         }
 
@@ -73,13 +73,18 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
         {
             if( packageId == null ) return null;
 
-            HashSet<VPackageId> dependencies = _vPackages[ packageId ];
+            var dependencies = _vPackages[ packageId ];
             if( dependencies.Count == 0 ) return new VPackage( packageId );
 
-            List<VPackage> vPackages = new List<VPackage>();
-            foreach( VPackageId dependency in dependencies ) vPackages.Add( GetVPackage( dependency ) );
+            List<Platform> platforms = new List<Platform>();
+            foreach( var platform in dependencies ) platforms.Add( GetPlatform( platform.Key, platform.Value ) );
 
-            return new VPackage( packageId, vPackages );
+            return new VPackage( packageId, platforms );
+        }
+
+        Platform GetPlatform( PlatformId platformId, IEnumerable<VPackageId> vPackageIds )
+        {
+            return new Platform( platformId, vPackageIds.Select( p => GetVPackage( p ) ).ToList() );
         }
 
         public async Task<IEnumerable<VPackageId>> GetNotCrawledVPackageIds( PackageSegment segment )

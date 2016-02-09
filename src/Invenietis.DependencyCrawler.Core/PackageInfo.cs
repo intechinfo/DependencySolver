@@ -8,21 +8,20 @@ namespace Invenietis.DependencyCrawler.Core
     public class PackageInfo
     {
         public PackageInfo( VPackageId packageInfo )
-            : this( packageInfo, new VPackageId[ 0 ] )
+            : this( packageInfo, null )
         {
         }
 
-        public PackageInfo( VPackageId packageInfo, IReadOnlyCollection<VPackageId> dependencies )
+        public PackageInfo( VPackageId packageInfo, IReadOnlyDictionary<PlatformId, IEnumerable<VPackageId>> dependencies )
         {
             if( packageInfo == null ) throw new ArgumentNullException( nameof( packageInfo ) );
-            if( dependencies == null ) throw new ArgumentNullException( nameof( dependencies ) );
-
+            if( dependencies == null ) dependencies = new Dictionary<PlatformId, IEnumerable<VPackageId>>();
             VPackageId = packageInfo;
             Dependencies = dependencies;
         }
 
         public VPackageId VPackageId { get; }
 
-        public IReadOnlyCollection<VPackageId> Dependencies { get; }
+        public IReadOnlyDictionary<PlatformId, IEnumerable<VPackageId>> Dependencies { get; }
     }
 }

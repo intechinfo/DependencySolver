@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace Invenietis.DependencyCrawler.Core.Tests
@@ -9,8 +10,7 @@ namespace Invenietis.DependencyCrawler.Core.Tests
         [Test]
         public void Ctor_WithNullArg_ShouldThrowArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>( () => new PackageInfo( null, new VPackageId[ 0 ] ) );
-            Assert.Throws<ArgumentNullException>( () => new PackageInfo( new VPackageId( PackageId.NuGet, "P", "1.0.0" ), null ) );
+            Assert.Throws<ArgumentNullException>( () => new PackageInfo( null, new Dictionary<PlatformId, IEnumerable<VPackageId>>() ) );
         }
 
         [Test]
@@ -18,14 +18,31 @@ namespace Invenietis.DependencyCrawler.Core.Tests
         {
             PackageInfo sut = new PackageInfo(
                 new VPackageId( PackageId.NuGet, "PackageId", "3.2.1" ),
-                new[]
+                new Dictionary<PlatformId, IEnumerable<VPackageId>>
                 {
-                    new VPackageId( PackageId.NuGet, "Package1", "1.0.0" ),
-                    new VPackageId( PackageId.NuGet, "Package2", "2.0.0" )
+                    {
+                        PlatformId.None,
+                        new[]
+                        {
+                            new VPackageId( PackageId.NuGet, "Package1", "1.0.0" ),
+                            new VPackageId( PackageId.NuGet, "Package2", "2.0.0" )
+                        }
+                    }
                 } );
 
             Assert.That( sut.VPackageId, Is.EqualTo( new VPackageId( PackageId.NuGet, "PackageId", "3.2.1" ) ) );
-            Assert.That( sut.Dependencies, Is.EquivalentTo( new[] { new VPackageId( PackageId.NuGet, "Package1", "1.0.0" ), new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ) } ) );
+            Assert.That( sut.Dependencies, Is.EquivalentTo(
+                new Dictionary<PlatformId, IEnumerable<VPackageId>>
+                {
+                    {
+                        PlatformId.None,
+                        new[]
+                        {
+                            new VPackageId( PackageId.NuGet, "Package1", "1.0.0" ),
+                            new VPackageId( PackageId.NuGet, "Package2", "2.0.0" )
+                        }
+                    }
+                } ) );
         }
     }
 }

@@ -32,7 +32,7 @@ namespace Invenietis.DependencyCrawler.Core
 
         public override int GetHashCode()
         {
-            return Id.GetHashCode() << 3 ^ Version.GetHashCode();
+            return ( Id.GetHashCode() << 7 ) ^ ( Version.GetHashCode() << 3 ) ^ PackageManager.GetHashCode();
         }
 
         public static bool operator ==( VPackageId p1, VPackageId p2 )

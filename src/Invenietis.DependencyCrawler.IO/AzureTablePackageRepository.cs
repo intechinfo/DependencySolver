@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Invenietis.DependencyCrawler.Abstractions;
 using Invenietis.DependencyCrawler.Core;
 using Microsoft.WindowsAzure.Storage;
@@ -32,7 +31,7 @@ namespace Invenietis.DependencyCrawler.IO
                   vPackageTableName,
                   notCrawledTableName,
                   vPackageCacheBlobContainerName,
-                  TimeSpan.FromMinutes( 1 ) )
+                  TimeSpan.FromMinutes( 2 ) )
         {
         }
 
@@ -52,7 +51,7 @@ namespace Invenietis.DependencyCrawler.IO
             _cacheTimeOut = cacheTimeOut;
         }
 
-        public async Task AddDependenciesIfNotExists( VPackageId vPackageId, IEnumerable<VPackageId> dependencies )
+        public async Task AddDependenciesIfNotExists( VPackageId vPackageId, IReadOnlyDictionary<PlatformId, IEnumerable<VPackageId>> dependencies )
         {
             TableOperation retrieveOperation = TableOperation.Retrieve<NotCrawledVPackageEntity>( vPackageId.PackageManager, $"{vPackageId.Id}|{vPackageId.Version}" );
             TableResult result = await NotCrawledVPackageTable.ExecuteAsync( retrieveOperation );
@@ -60,7 +59,7 @@ namespace Invenietis.DependencyCrawler.IO
             if( notCrawledEntity == null ) return;
 
             VPackageEntity vPackageEntity = new VPackageEntity( vPackageId );
-            vPackageEntity.Dependencies = SerializeDependencies( dependencies );
+            vPackageEntity.Dependencies = PackageSerializer.Serialize( dependencies );
             TableOperation insertOperation = TableOperation.Insert( vPackageEntity );
             await VPackageTable.ExecuteAsync( insertOperation );
 
@@ -217,16 +216,28 @@ namespace Invenietis.DependencyCrawler.IO
 
             if( string.IsNullOrWhiteSpace( entity.Dependencies ) ) return new VPackage( vPackageId );
 
-            List<VPackage> dependencies = new List<VPackage>();
-            foreach( VPackageId dependency in DeserializeVPackageDependencies( entity.Dependencies ) )
+            List<Platform> platforms = new List<Platform>();
+            foreach( var dependency in PackageSerializer.DeserializeVPackageDependencies( entity.Dependencies ) )
             {
-                VPackage vPackage = await GetVPackage( dependency );
-                if( vPackage != null ) dependencies.Add( vPackage );
+                Platform platform = await GetPlatform( dependency.Key, dependency.Value );
+                if( platform != null ) platforms.Add( platform );
             }
 
-            VPackage result = new VPackage( vPackageId, dependencies );
+            VPackage result = new VPackage( vPackageId, platforms );
             await CacheVPackage( result );
             return result;
+        }
+
+        async Task<Platform> GetPlatform( PlatformId platformId, IEnumerable<VPackageId> dependencies )
+        {
+            List<VPackage> vPackages = new List<VPackage>();
+            foreach( VPackageId dependency in dependencies )
+            {
+                VPackage vPackage = await GetVPackage( dependency );
+                if( vPackage != null ) vPackages.Add( vPackage );
+            }
+
+            return new Platform( platformId, vPackages );
         }
 
         async Task CacheVPackage( VPackage vPackage )
@@ -246,40 +257,6 @@ namespace Invenietis.DependencyCrawler.IO
 
             VPackage result = PackageSerializer.DeserializeVPackage( serializedVPackage );
             return Tuple.Create( true, result );
-        }
-
-        string SerializeDependencies( IEnumerable<VPackageId> dependencies )
-        {
-            if( dependencies == null ) dependencies = new VPackageId[ 0 ];
-            return new XElement(
-                "Dependencies",
-                dependencies.Select( d => new XElement(
-                    "Dependency",
-                    new XAttribute( "PackageManager", d.PackageManager ),
-                    new XAttribute( "Id", d.Id ),
-                    new XAttribute( "Version", d.Version ) ) ) )
-                .ToString();
-        }
-
-        static IReadOnlyCollection<VPackageId> DeserializeVPackageDependencies( string dependencies )
-        {
-            return XElement.Parse( dependencies )
-                .Descendants()
-                .Select( d => new VPackageId(
-                     d.Attribute( "PackageManager" ).Value,
-                     d.Attribute( "Id" ).Value,
-                     d.Attribute( "Version" ).Value ) )
-                .ToList();
-        }
-
-        VPackage DeserializeVPackage( XElement xElement )
-        {
-            return new VPackage(
-                new VPackageId(
-                    xElement.Attribute( "PackageManager" ).Value,
-                    xElement.Attribute( "Id" ).Value,
-                    xElement.Attribute( "Version" ).Value ),
-                xElement.Element( "Dependencies" ).Elements( "VPackage" ).Select( x => DeserializeVPackage( x ) ).ToList() );
         }
 
         CloudStorageAccount _cloudStorageAccount;

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Invenietis.DependencyCrawler.Core;
 using NSubstitute;
 using NUnit.Framework;
@@ -61,15 +62,29 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             PackageInfo package = await sut.GetPackage( new VPackageId( PackageId.NuGet, "TestPackage3", "1.0.0" ) );
 
             Assert.That( package.VPackageId, Is.EqualTo( new VPackageId( PackageId.NuGet, "TestPackage3", "1.0.0" ) ) );
-            Assert.That( package.Dependencies, Is.EqualTo( new[]
+            Assert.That( package.Dependencies, Is.EquivalentTo( new Dictionary<PlatformId, IEnumerable<VPackageId>>
             {
-                new VPackageId( PackageId.NuGet, "NUnit", "3.0.1" ),
-                new VPackageId( PackageId.NuGet, "EntityFramework.MicrosoftSqlServer", "7.0.0-rc1-final" ),
-                new VPackageId( PackageId.NuGet, "Microsoft.CSharp", "4.0.1-beta-23516" ),
-                new VPackageId( PackageId.NuGet, "System.Collections", "4.0.11-beta-23516" ),
-                new VPackageId( PackageId.NuGet, "System.Linq", "4.0.1-beta-23516" ),
-                new VPackageId( PackageId.NuGet, "System.Runtime", "4.0.21-beta-23516" ),
-                new VPackageId( PackageId.NuGet, "System.Threading", "4.0.11-beta-23516" )
+                {
+                    new PlatformId( ".NETPlatform,Version=v5.4" ),
+                    new[]
+                    {
+                        new VPackageId( PackageId.NuGet, "NUnit", "3.0.1" ),
+                        new VPackageId( PackageId.NuGet, "EntityFramework.MicrosoftSqlServer", "7.0.0-rc1-final" ),
+                        new VPackageId( PackageId.NuGet, "Microsoft.CSharp", "4.0.1-beta-23516" ),
+                        new VPackageId( PackageId.NuGet, "System.Collections", "4.0.11-beta-23516" ),
+                        new VPackageId( PackageId.NuGet, "System.Linq", "4.0.1-beta-23516" ),
+                        new VPackageId( PackageId.NuGet, "System.Runtime", "4.0.21-beta-23516" ),
+                        new VPackageId( PackageId.NuGet, "System.Threading", "4.0.11-beta-23516" )
+                    }
+                },
+                {
+                    new PlatformId( ".NETFramework,Version=v4.5.1" ),
+                    new[]
+                    {
+                        new VPackageId( PackageId.NuGet, "NUnit", "3.0.1" ),
+                        new VPackageId( PackageId.NuGet, "EntityFramework.MicrosoftSqlServer", "7.0.0-rc1-final" )
+                    }
+                }
             } ) );
         }
 

@@ -88,7 +88,7 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             await sut.AddIfNotExists( packageId );
             VPackageId lastRelease = new VPackageId( "Test", packageId.Value, "1.0.0" );
             await sut.AddIfNotExists( lastRelease );
-            await sut.AddDependenciesIfNotExists( lastRelease, new VPackageId[ 0 ] );
+            await sut.AddDependenciesIfNotExists( lastRelease, new Dictionary<PlatformId, IEnumerable<VPackageId>>() );
 
             await sut.UpdateLastRelease( packageId, lastRelease );
 
@@ -107,7 +107,7 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             await sut.AddIfNotExists( packageId );
             VPackageId lastPreRelease = new VPackageId( "Test", packageId.Value, "2.0.0-alpha" );
             await sut.AddIfNotExists( lastPreRelease );
-            await sut.AddDependenciesIfNotExists( lastPreRelease, new VPackageId[ 0 ] );
+            await sut.AddDependenciesIfNotExists( lastPreRelease, new Dictionary<PlatformId, IEnumerable<VPackageId>>() );
 
             await sut.UpdateLastPreRelease( packageId, lastPreRelease );
 
@@ -133,12 +133,14 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             await sut.UpdateLastPreRelease( packageId, lastPreRelease );
             VPackageId dependencyId1 = new VPackageId( "Test", Guid.NewGuid().ToString(), "1.0.0" );
             VPackageId dependencyId2 = new VPackageId( "Test", Guid.NewGuid().ToString(), "1.0.0" );
+            await sut.AddIfNotExists( dependencyId1 );
+            await sut.AddIfNotExists( dependencyId2 );
             IEnumerable<VPackageId> dependencyIds = new[] { dependencyId1, dependencyId2 };
 
-            await sut.AddDependenciesIfNotExists( dependencyId1, new VPackageId[ 0 ] );
-            await sut.AddDependenciesIfNotExists( dependencyId2, new VPackageId[ 0 ] );
-            await sut.AddDependenciesIfNotExists( lastPreRelease, new VPackageId[ 0 ] );
-            await sut.AddDependenciesIfNotExists( lastRelease, dependencyIds );
+            await sut.AddDependenciesIfNotExists( dependencyId1, new Dictionary<PlatformId, IEnumerable<VPackageId>>() );
+            await sut.AddDependenciesIfNotExists( dependencyId2, new Dictionary<PlatformId, IEnumerable<VPackageId>>() );
+            await sut.AddDependenciesIfNotExists( lastPreRelease, new Dictionary<PlatformId, IEnumerable<VPackageId>>() );
+            await sut.AddDependenciesIfNotExists( lastRelease, new Dictionary<PlatformId, IEnumerable<VPackageId>>() { { PlatformId.None, dependencyIds } } );
 
             Package package = await sut.GetPackageById( packageId );
             Assert.That( package, Is.EqualTo(
@@ -168,6 +170,40 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
 
             notCrawled = await sut.GetNotCrawledVPackageIds( new PackageSegment( "Test", vPackageId.Id ) );
             Assert.That( notCrawled.Count( x => x == vPackageId ), Is.EqualTo( 0 ) );
+        }
+
+        [Test]
+        public async Task GetPackageById_WithSimplePackage_ShouldReturnThisPackage()
+        {
+            IPackageRepository sut = CreatePackageRepository();
+            PackageId packageId = new PackageId( "Test", Guid.NewGuid().ToString() );
+            VPackageId lastRelease = new VPackageId( packageId.PackageManager, packageId.Value, "1.0.0" );
+            await sut.AddIfNotExists( packageId );
+            await sut.AddIfNotExists( lastRelease );
+            VPackageId dependency = new VPackageId( packageId.PackageManager, Guid.NewGuid().ToString(), "2.0.0" );
+            await sut.AddIfNotExists( dependency );
+            await sut.AddDependenciesIfNotExists( lastRelease, new Dictionary<PlatformId, IEnumerable<VPackageId>>
+            {
+                { new PlatformId( "TestPlatform" ), new[] { dependency } }
+            } );
+            await sut.AddDependenciesIfNotExists( dependency, new Dictionary<PlatformId, IEnumerable<VPackageId>>() );
+            await sut.UpdateLastRelease( packageId, lastRelease );
+
+            Package package = await sut.GetPackageById( packageId );
+
+            Assert.That( package, Is.EqualTo( new Package(
+                packageId,
+                new VPackage(
+                    lastRelease,
+                    new[]
+                    {
+                        new Platform(
+                            new PlatformId( "TestPlatform" ),
+                            new[]
+                            {
+                                new VPackage( dependency )
+                            } )
+                    } ) ) ) );
         }
 
         protected abstract IPackageRepository CreatePackageRepository();

@@ -2,6 +2,7 @@
 using NSubstitute;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Invenietis.DependencyCrawler.Abstractions.Tests
 {
@@ -25,11 +26,15 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             fakeDownloader.GetMaxVersion( new PackageId( PackageId.NuGet, "Package1" ) ).Returns( new PackageMaxVersion( "1.0.0", "1.0.1-beta" ) );
             fakeDownloader.GetMaxVersion( new PackageId( PackageId.NuGet, "Package2" ) ).Returns( new PackageMaxVersion( "2.0.0" ) );
             fakeDownloader.GetPackage( new VPackageId( PackageId.NuGet, "Package1", "1.0.0" ) )
-                .Returns( new PackageInfo( new VPackageId( PackageId.NuGet, "Package1", "1.0.0" ), new[] { new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ) } ) );
+                .Returns( new PackageInfo(
+                    new VPackageId( PackageId.NuGet, "Package1", "1.0.0" ),
+                    new Dictionary<PlatformId, IEnumerable<VPackageId>> { { PlatformId.None, new[] { new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ) } } } ) );
             fakeDownloader.GetPackage( new VPackageId( PackageId.NuGet, "Package1", "1.0.1-beta" ) )
-                .Returns( new PackageInfo( new VPackageId( PackageId.NuGet, "Package1", "1.0.1-beta" ), new[] { new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ) } ) );
+                .Returns( new PackageInfo(
+                    new VPackageId( PackageId.NuGet, "Package1", "1.0.1-beta" ),
+                    new Dictionary<PlatformId, IEnumerable<VPackageId>> { { PlatformId.None, new[] { new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ) } } } ) );
             fakeDownloader.GetPackage( new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ) )
-                .Returns( new PackageInfo( new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ), new VPackageId[ 0 ] ) );
+                .Returns( new PackageInfo( new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ) ) );
 
             FakePackageRepository fakeRepository = new FakePackageRepository();
             await fakeRepository.AddIfNotExists( new PackageId( PackageId.NuGet, "Package1" ) );
@@ -54,9 +59,7 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
                 new Package(
                     PackageId.NuGet,
                     "Package2",
-                        new VPackage(
-                            new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ),
-                            new VPackage[0] ) )
+                        new VPackage( new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ) ) )
             } ) );
         }
 
@@ -94,31 +97,31 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             fakeDownloader.GetPackage( new VPackageId( PackageId.NuGet, "Package1", "1.0.0" ) )
                 .Returns( new PackageInfo(
                     new VPackageId( PackageId.NuGet, "Package1", "1.0.0" ),
-                    new[] { new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ) } ) );
+                    new Dictionary<PlatformId, IEnumerable<VPackageId>> { { PlatformId.None, new[] { new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ) } } } ) );
             fakeDownloader.GetPackage( new VPackageId( PackageId.NuGet, "Package1", "1.1.0-beta" ) )
                 .Returns( new PackageInfo(
                     new VPackageId( PackageId.NuGet, "Package1", "1.1.0-beta" ),
-                    new[] { new VPackageId( PackageId.NuGet, "Package2", "2.1.0-beta" ) } ) );
+                    new Dictionary<PlatformId, IEnumerable<VPackageId>> { { PlatformId.None, new[] { new VPackageId( PackageId.NuGet, "Package2", "2.1.0-beta" ) } } } ) );
             fakeDownloader.GetPackage( new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ) )
-                .Returns( new PackageInfo(new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ), new VPackageId[ 0 ] ) );
+                .Returns( new PackageInfo(new VPackageId( PackageId.NuGet, "Package2", "2.0.0" ) ) );
             fakeDownloader.GetPackage( new VPackageId( PackageId.NuGet, "Package2", "2.0.1" ) )
-                .Returns( new PackageInfo( new VPackageId( PackageId.NuGet, "Package2", "2.0.1" ), new VPackageId[ 0 ] ) );
+                .Returns( new PackageInfo( new VPackageId( PackageId.NuGet, "Package2", "2.0.1" ) ) );
             fakeDownloader.GetPackage( new VPackageId( PackageId.NuGet, "Package2", "2.1.0-beta" ) )
                 .Returns( new PackageInfo(
                     new VPackageId( PackageId.NuGet, "Package2", "2.1.0-beta" ),
-                    new[] { new VPackageId( PackageId.NuGet, "Package3", "3.0.0" ) } ) );
+                    new Dictionary<PlatformId, IEnumerable<VPackageId>> { { PlatformId.None, new[] { new VPackageId( PackageId.NuGet, "Package3", "3.0.0" ) } } } ) );
             fakeDownloader.GetPackage( new VPackageId( PackageId.NuGet, "Package3", "3.0.0" ) )
                 .Returns( new PackageInfo(
                     new VPackageId( PackageId.NuGet, "Package3", "3.0.0" ),
-                    new[] { new VPackageId( PackageId.NuGet, "Package4", "4.0.0" ) } ) );
+                    new Dictionary<PlatformId, IEnumerable<VPackageId>> { { PlatformId.None, new[] { new VPackageId( PackageId.NuGet, "Package4", "4.0.0" ) } } } ) );
             fakeDownloader.GetPackage( new VPackageId( PackageId.NuGet, "Package3", "3.1.0" ) )
                 .Returns( new PackageInfo(
                     new VPackageId( PackageId.NuGet, "Package3", "3.1.0" ),
-                    new[] { new VPackageId( PackageId.NuGet, "Package4", "4.1.0" ) } ) );
+                    new Dictionary<PlatformId, IEnumerable<VPackageId>> { { PlatformId.None, new[] { new VPackageId( PackageId.NuGet, "Package4", "4.1.0" ) } } } ) );
             fakeDownloader.GetPackage( new VPackageId( PackageId.NuGet, "Package4", "4.0.0" ) )
-                .Returns( new PackageInfo( new VPackageId( PackageId.NuGet, "Package4", "4.0.0" ), new VPackageId[ 0 ] ) );
+                .Returns( new PackageInfo( new VPackageId( PackageId.NuGet, "Package4", "4.0.0" ) ) );
             fakeDownloader.GetPackage( new VPackageId( PackageId.NuGet, "Package4", "4.1.0" ) )
-                .Returns( new PackageInfo( new VPackageId( PackageId.NuGet, "Package4", "4.1.0" ), new VPackageId[ 0 ] ) );
+                .Returns( new PackageInfo( new VPackageId( PackageId.NuGet, "Package4", "4.1.0" ) ) );
 
             FakePackageRepository fakeRepository = new FakePackageRepository();
             await fakeRepository.AddIfNotExists( new PackageId( PackageId.NuGet, "Package1" ) );
@@ -154,9 +157,7 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
                 new Package(
                     PackageId.NuGet,
                     "Package2",
-                        new VPackage(
-                            new VPackageId( PackageId.NuGet, "Package2", "2.0.1" ),
-                            new VPackage[0] ),
+                        new VPackage( new VPackageId( PackageId.NuGet, "Package2", "2.0.1" ) ),
                         new VPackage(
                             new VPackageId( PackageId.NuGet, "Package2", "2.1.0-beta" ),
                             new[]
@@ -175,8 +176,7 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
                     PackageId.NuGet,
                     "Package4",
                         new VPackage(
-                            new VPackageId( PackageId.NuGet, "Package4", "4.1.0" ),
-                            new VPackage[0] ) )
+                            new VPackageId( PackageId.NuGet, "Package4", "4.1.0" ) ) )
             } ) );
         }
 
