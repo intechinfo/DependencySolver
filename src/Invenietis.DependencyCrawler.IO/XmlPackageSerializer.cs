@@ -23,11 +23,24 @@ namespace Invenietis.DependencyCrawler.IO
 
         VPackage BuildVPackage( VPackageId vPackageId, Dictionary<VPackageId, IEnumerable<VPackageId>> dependenciesDict )
         {
+            return BuildVPackage( vPackageId, dependenciesDict, new Dictionary<VPackageId, VPackage>() );
+        }
+
+        VPackage BuildVPackage(
+            VPackageId vPackageId,
+            Dictionary<VPackageId, IEnumerable<VPackageId>> dependenciesDict,
+            Dictionary<VPackageId, VPackage> cache )
+        {
+            VPackage cached;
+            if( cache.TryGetValue( vPackageId, out cached ) ) return cached;
+
             IReadOnlyCollection<VPackage> dependencies =
-                dependenciesDict[ vPackageId ].Select( x => BuildVPackage( x, dependenciesDict ) )
+                dependenciesDict[ vPackageId ].Select( x => BuildVPackage( x, dependenciesDict, cache ) )
                                               .ToList();
 
-            return new VPackage( vPackageId, dependencies );
+            VPackage result = new VPackage( vPackageId, dependencies );
+            cache.Add( vPackageId, result );
+            return result;
         }
 
         IEnumerable<VPackageId> DependenciesFromXElement( XElement xElement )
