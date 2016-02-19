@@ -1,0 +1,38 @@
+<h1>Add Feed</h1>
+<div class="container">
+    <fieldset>
+        <form (ngSubmit)="onSubmit(type, url, isPrivate, pwd)">
+            <br />
+            <div class="form-group">
+                <label for="type">Type</label><br />
+                <select name="type" #type>
+                    <option disabled selected value=""> -- select a type -- </option>
+                    <option value="NuGet">NuGet</option>
+                    <option value="Git">Git</option>
+                    <option value="NPM">NPM</option>
+                </select>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="url">URL</label><br />
+                <input type="text" #url class="form-control" placeholder="URL" required>
+            </div>
+            <br />
+            <div ng-app="">
+                <div class="form-group">
+                    <label for="isPrivate">Is private</label>
+                    <input type="checkbox" name="isPrivate" #isPrivate (click)="IsPrivate(pwd)">
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="Password" #pwd class="pwd form-control" disabled required>
+                </div>
+            </div>
+            <br />
+            <input type="submit" class="submit btn" value="Submit" />
+            <input type="reset" class="submit reset btn" value="Back" [routerLink]="['AddRoot']" />
+        </form>
+    </fieldset>
+    <div class="successDiv" #successDiv hidden>
+        <label class="success">Creation done</label>
+    </div>
+</div>

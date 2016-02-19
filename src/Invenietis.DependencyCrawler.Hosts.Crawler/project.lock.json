@@ -262,7 +262,7 @@
           "lib/net451/Microsoft.Extensions.Primitives.dll": {}
         }
       },
-      "Microsoft.Web.Xdt/2.1.1": {
+      "Microsoft.Web.Xdt/2.1.0": {
         "type": "package",
         "compile": {
           "lib/net40/Microsoft.Web.XmlTransform.dll": {}
@@ -620,7 +620,7 @@
           "lib/net451/Microsoft.Extensions.Primitives.dll": {}
         }
       },
-      "Microsoft.Web.Xdt/2.1.1": {
+      "Microsoft.Web.Xdt/2.1.0": {
         "type": "package",
         "compile": {
           "lib/net40/Microsoft.Web.XmlTransform.dll": {}
@@ -978,7 +978,7 @@
           "lib/net451/Microsoft.Extensions.Primitives.dll": {}
         }
       },
-      "Microsoft.Web.Xdt/2.1.1": {
+      "Microsoft.Web.Xdt/2.1.0": {
         "type": "package",
         "compile": {
           "lib/net40/Microsoft.Web.XmlTransform.dll": {}
@@ -1336,7 +1336,7 @@
           "lib/net451/Microsoft.Extensions.Primitives.dll": {}
         }
       },
-      "Microsoft.Web.Xdt/2.1.1": {
+      "Microsoft.Web.Xdt/2.1.0": {
         "type": "package",
         "compile": {
           "lib/net40/Microsoft.Web.XmlTransform.dll": {}
@@ -1694,7 +1694,7 @@
           "lib/net451/Microsoft.Extensions.Primitives.dll": {}
         }
       },
-      "Microsoft.Web.Xdt/2.1.1": {
+      "Microsoft.Web.Xdt/2.1.0": {
         "type": "package",
         "compile": {
           "lib/net40/Microsoft.Web.XmlTransform.dll": {}
@@ -2052,7 +2052,7 @@
           "lib/net451/Microsoft.Extensions.Primitives.dll": {}
         }
       },
-      "Microsoft.Web.Xdt/2.1.1": {
+      "Microsoft.Web.Xdt/2.1.0": {
         "type": "package",
         "compile": {
           "lib/net40/Microsoft.Web.XmlTransform.dll": {}
@@ -2413,13 +2413,13 @@
         "Microsoft.Extensions.Primitives.nuspec"
       ]
     },
-    "Microsoft.Web.Xdt/2.1.1": {
+    "Microsoft.Web.Xdt/2.1.0": {
       "type": "package",
-      "sha512": "PHoqib4d+f2lmnluVwMFM8M4AF8Z7y2g18hUTi5UCKkjNQIzkNnB1uyqnS5od2sMsRcI/9mexQjDO6e5dL/MeA==",
+      "sha512": "/ieJ02r4MEJM21Eyl+c5kwoJWPhy+qEEcN68JaqDoamabgxJI1jGi/kNLuKvHUCl6tU7E0rMvaR6FmEnDWtS4A==",
       "files": [
         "lib/net40/Microsoft.Web.XmlTransform.dll",
-        "Microsoft.Web.Xdt.2.1.1.nupkg",
-        "Microsoft.Web.Xdt.2.1.1.nupkg.sha512",
+        "Microsoft.Web.Xdt.2.1.0.nupkg",
+        "Microsoft.Web.Xdt.2.1.0.nupkg.sha512",
         "Microsoft.Web.Xdt.nuspec"
       ]
     },

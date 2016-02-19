@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="./style.css">
+    <base href="/">
+    <meta charset="utf-8" />
+    <title>Independency Manager</title>
+    <!-- 1. Load libraries -->
+
+    <script src="libs/es6-shim.min.js"></script>
+    <script src="libs/system-polyfills.js"></script>
+    <script src="libs/angular2-polyfills.js"></script>
+    <script src="libs/system.src.js"></script>
+    <script src="libs/Rx.js"></script>
+    <script src="libs/angular2.dev.js"></script>
+    <script src="libs/router.dev.js"></script>
+    <script src="libs/cytoscape.js"></script>
+    <script src="libs/http.dev.js"></script>
+
+    <!-- 2. Configure SystemJS -->
+    <script>
+        System.config({
+            packages: {
+                appScripts: {
+                    format: 'register',
+                    defaultExtension: 'js'
+                }
+            }
+        });
+    </script>
+    <script>
+
+        System.import('appScripts/boot')
+              .then(null, console.error.bind(console));
+    </script>
+</head>
+<body>
+    <my-app>Loading...</my-app>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "version": "1.0.0-*",
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "Microsoft.AspNet.IISPlatformHandler": "1.0.0-rc1-final",
+    "Microsoft.AspNet.Mvc.ViewFeatures": "6.0.0-rc1-final",
+    "Microsoft.AspNet.Server.Kestrel": "1.0.0-rc1-final",
+    "Microsoft.AspNet.StaticFiles": "1.0.0-rc1-final",
+    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
+    "Invenietis.DependencyCrawler.Core": "0.0.0-Absolutely-Invalid",
+    "Invenietis.DependencyCrawler.Abstractions": "0.0.0-Absolutely-Invalid",
+    "Newtonsoft.Json": "8.0.2"
+  },
+
+  "commands": {
+    "web": "Microsoft.AspNet.Server.Kestrel"
+  },
+
+  "frameworks": {
+    "dnx451": {
+      "dependencies": {
+        "Invenietis.DependencyCrawler.IO": "0.0.0-Absolutely-Invalid"
+      }
+    }
+  },
+
+  "exclude": [
+    "node_modules"
+  ],
+  "publishExclude": [
+    "**.user",
+    "**.vspscc"
+  ]
+}

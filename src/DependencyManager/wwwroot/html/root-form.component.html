@@ -1,0 +1,37 @@
+<h1>Add Root</h1>
+<div class="container">
+    <fieldset>
+        <form class="form" (ngSubmit)="onSubmit(name, type, feed, successDiv)">
+            <br />
+            <div class="form-group">
+                <label for="name">Name</label><br />
+                <input type="text" #name class="form-control" placeholder="Name" value="{{GetName}}" required>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="type">Type</label><br />
+                <select name="type" class="selectType" (change)="onselect(type)" #type required>
+                    <option disabled selected value=""> -- select a type -- </option>
+                    <option value="NuGet">NuGet</option>
+                    <option value="Git">Git</option>
+                    <option value="NPM">NPM</option>
+                </select>
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="feed">Feed</label><br />
+                <select name="feed" class="selectFeed" #feed required>
+                    <option disabled selected value=""> -- select a feed -- </option>
+                    <option *ngFor="#Feed of FEEDS">{{Feed.url}}</option>
+                </select>
+                <label (click)="ToAddFeed(name.value)" class="btn btn-nav-3">+</label>
+            </div>
+            <br />
+            <input type="submit" class="submit btn" name="submit" value="Submit" />
+            <input type="reset" class="submit btn" name="reset" value="Back" [routerLink]="['Roots']"/>
+        </form>
+    </fieldset>
+    <div class="successDiv" #successDiv hidden>
+        <label class="success">Creation done</label>
+    </div>
+</div>

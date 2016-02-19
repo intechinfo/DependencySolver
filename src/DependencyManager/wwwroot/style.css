@@ -1,0 +1,205 @@
+﻿body {
+    margin: auto;
+    background-repeat: repeat;
+    background-image: url('./Ressources/bg.png');
+    font-family: "Trebuchet MS";
+    color: white;
+}
+
+#cy {
+    width: 1000px;
+    height: 600px;
+    display: block;
+    margin: auto;
+    border-style: solid;
+    border-radius: 1px;
+    border-color: #D2860C;
+    background-color: #5F5F5F;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-spacing: initial;
+}
+
+.successDiv {
+    text-align: center;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-color: #D2860C;
+    background-color: #5F5F5F;
+    border-style: solid;
+    border-top: 0px;
+    width: 50%;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.tab {
+    margin: auto;
+    border-style: solid;
+    border-radius: 1px;
+    border-color: #D2860C;
+    background-color: #5F5F5F;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-spacing: initial;
+}
+
+fieldset {
+    text-align: center;
+    padding: 0 20px 20px 20px;
+    margin: auto;
+    border-style: solid;
+    border-radius: 1px;
+    border-color: #D2860C;
+    background-color: #5F5F5F;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-spacing: initial;
+}
+
+.container {
+    position: absolute;
+    margin-bottom: 10px;
+    margin-left: 50%;
+    left: -150px;
+    width: 300px;
+}   
+
+.graph {
+    width: auto !important;
+    left: -500px !important;
+}
+
+select {
+    padding: 3px;
+    border: 1px solid #F5C5C5;
+    border-radius: 5px;
+    width: 200px;
+    box-shadow: 1px 1px 2px #C0C0C0 inset;
+}
+
+input[type=text], input[type=password] {
+    padding:3px;
+    border:1px solid #F5C5C5;
+    border-radius:5px;
+    width:200px;
+    box-shadow:1px 1px 2px #C0C0C0 inset;
+}
+
+.x {
+    background-image: url('./Ressources/bin.png');
+    background-size: 15%;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+}
+
+th {
+    border-bottom: solid;
+    border-bottom-color: #D2860C;
+    max-width: 250px;
+    min-width: 250px;
+    height: 75px;
+}
+
+td {
+    padding-left: 50px;
+    cursor: pointer;
+}
+
+tr {
+    height: 60px;
+}
+
+.lign-root:hover {
+    background-color: #929292;
+}
+
+h1 {
+    background-color: #D2860C;
+    margin-top: 0px;
+    text-align: center;
+}
+
+.btn-graph {
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.btn {
+  border-color: #e89c03;
+  background-color: #e89c03;
+  background-image: -webkit-linear-gradient(top, #e89c03, #c26700);
+  background-image: -moz-linear-gradient(top, #e89c03, #c26700);
+  background-image: -ms-linear-gradient(top, #e89c03, #c26700);
+  background-image: -o-linear-gradient(top, #e89c03, #c26700);
+  background-image: linear-gradient(to bottom, #e89c03, #c26700);
+  -webkit-border-radius: 4;
+  -moz-border-radius: 4;
+  border-radius: 4px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 15px;
+  padding: 11px 20px 10px 20px;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #f5a300;
+  background-image: -webkit-linear-gradient(top, #f5a300, #f07c00);
+  background-image: -moz-linear-gradient(top, #f5a300, #f07c00);
+  background-image: -ms-linear-gradient(top, #f5a300, #f07c00);
+  background-image: -o-linear-gradient(top, #f5a300, #f07c00);
+  background-image: linear-gradient(to bottom, #f5a300, #f07c00);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-nav-2 {
+    text-align: center;
+   padding-top: 10px;
+}
+
+.btn-nav-3 {
+    padding: 5px 5px 5px 5px;
+}
+
+.conf {
+    text-align: center;
+    margin: auto;
+    border-style: solid;
+    border-radius: 1px;
+    border-color: #D2860C;
+    background-color: #5F5F5F;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-spacing: initial;
+    width: 375px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.Git {
+    background-image: url('./Ressources/git.png');
+    background-position-y: center;
+    background-position-x: 5px;
+    background-size: 15%;
+    background-repeat: no-repeat;
+}
+
+.NPM {
+    background-image: url('./Ressources/npm.png');
+    background-position-y: center;
+    background-position-x: 5px;
+    background-size: 15%;
+    background-repeat: no-repeat;
+}
+
+.NuGet {
+    background-image: url('./Ressources/nuget.png');
+    background-position-y: center;
+    background-position-x: 5px;
+    background-size: 15%;
+    background-repeat: no-repeat;
+}

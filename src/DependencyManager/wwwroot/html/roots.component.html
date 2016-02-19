@@ -1,0 +1,24 @@
+<div>
+    <h1>Roots</h1>
+    <div #tab>
+        <table class="tab" >
+            <tr>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Delete</th>
+            </tr>
+            <tr *ngFor="#Root of ROOTS" id="{{Root.name}}" class="lign-root">
+                <td class="{{Root.type}}" (click)="OpenGraph(Root)">{{Root.type}}</td>
+                <td (click)="OpenGraph(Root)">{{Root.name}}</td>
+                <td (click)="ConfSelect(Root.name, conf, tab)" class="x"></td>
+            </tr>
+        </table>
+        <div class="btn-nav-2">
+            <button [routerLink]="['AddRoot']" class="btn">Add Root</button>
+        </div>
+    </div>
+    <div class="conf" #conf hidden>
+        Suppression de : {{SelectRoot}}<br /><br/>
+        <button (click)="DelSelect(true, conf, tab)" class="btn btnconf">Confirmer</button> <button class="btn btncancel" (click)="DelSelect(false, conf, tab)">Annuler</button>
+    </div>
+</div>

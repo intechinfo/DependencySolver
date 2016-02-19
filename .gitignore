@@ -5,3 +5,4 @@ TestResult.xml
 SGVVersionInfo.cs
 appsettings.json
 *.xproj.user
+src/DependencyManager/node_modules/
