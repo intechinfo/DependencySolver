@@ -6,6 +6,8 @@ namespace Invenietis.DependencyCrawler.Abstractions
 {
     public interface IPackageRepository
     {
+        Task<IEnumerable<PackageId>> GetAllPackageIds();
+
         Task<IEnumerable<PackageId>> GetPackageIds( PackageSegment segment );
 
         Task<IEnumerable<VPackageId>> GetVPackageIds( PackageSegment segment );

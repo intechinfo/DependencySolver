@@ -116,6 +116,21 @@ namespace Invenietis.DependencyCrawler.IO
                 } );
         }
 
+        public async Task<IEnumerable<PackageId>> GetAllPackageIds()
+        {
+            TableQuery<PackageEntity> query = new TableQuery<PackageEntity>();
+            TableContinuationToken continuationToken = null;
+            List<PackageId> packageIds = new List<PackageId>();
+            do
+            {
+                TableQuerySegment<PackageEntity> s = await PackageTable.ExecuteQuerySegmentedAsync( query, continuationToken );
+                continuationToken = s.ContinuationToken;
+                foreach( PackageEntity e in s.Results ) packageIds.Add( new PackageId( e.PartitionKey, e.RowKey ) );
+            } while( continuationToken != null );
+
+            return packageIds;
+        }
+
         public Task<IEnumerable<PackageId>> GetPackageIds( PackageSegment segment )
         {
             return GetIds<PackageEntity, PackageId>(

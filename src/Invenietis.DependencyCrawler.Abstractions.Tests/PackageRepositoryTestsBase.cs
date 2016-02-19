@@ -11,6 +11,24 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
     public abstract class PackageRepositoryTestsBase
     {
         [Test]
+        public async Task GetAllPackageIds_After3PackageIdsWhereInserted_ShouldReturnASetContainingThisPackageIds()
+        {
+            IPackageRepository sut = CreatePackageRepository();
+            PackageId packageId1 = new PackageId( "Test", Guid.NewGuid().ToString() );
+            PackageId packageId2 = new PackageId( "Test", Guid.NewGuid().ToString() );
+            PackageId packageId3 = new PackageId( "Test", Guid.NewGuid().ToString() );
+            await sut.AddIfNotExists( packageId1 );
+            await sut.AddIfNotExists( packageId2 );
+            await sut.AddIfNotExists( packageId3 );
+
+            IEnumerable<PackageId> packageIds = await sut.GetAllPackageIds();
+
+            Assert.That( packageIds, Contains.Item( packageId1 ) );
+            Assert.That( packageIds, Contains.Item( packageId2 ) );
+            Assert.That( packageIds, Contains.Item( packageId3 ) );
+        }
+
+        [Test]
         public async Task AddIfNotExists_WithNewPackageId_ShouldAddThisPackageId()
         {
             IPackageRepository sut = CreatePackageRepository();

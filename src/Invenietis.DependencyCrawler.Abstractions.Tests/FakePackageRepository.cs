@@ -119,6 +119,11 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             return GetPackage( packageId );
         }
 
+        public async Task<IEnumerable<PackageId>> GetAllPackageIds()
+        {
+            return _packages.Select( p => p.Key );
+        }
+
 #pragma warning restore 1998
 
     }
