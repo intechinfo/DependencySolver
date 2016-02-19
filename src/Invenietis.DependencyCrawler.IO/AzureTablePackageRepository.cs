@@ -92,16 +92,7 @@ namespace Invenietis.DependencyCrawler.IO
 
         public async Task<IEnumerable<Package>> GetAllPackages()
         {
-            TableQuery<PackageEntity> query = new TableQuery<PackageEntity>();
-            TableContinuationToken continuationToken = null;
-            List<Package> result = new List<Package>();
-            do
-            {
-                TableQuerySegment<PackageEntity> s = await PackageTable.ExecuteQuerySegmentedAsync( query, continuationToken );
-                continuationToken = s.ContinuationToken;
-                foreach( PackageEntity e in s.Results ) result.Add( await GetPackage( e ) );
-            } while( continuationToken != null );
-            return result;
+            return await GetAll<Package, PackageEntity>( async e => await GetPackage( e ) );
         }
 
         public Task<IEnumerable<VPackageId>> GetNotCrawledVPackageIds( PackageSegment segment )
@@ -116,19 +107,25 @@ namespace Invenietis.DependencyCrawler.IO
                 } );
         }
 
-        public async Task<IEnumerable<PackageId>> GetAllPackageIds()
+        public Task<IEnumerable<PackageId>> GetAllPackageIds()
         {
-            TableQuery<PackageEntity> query = new TableQuery<PackageEntity>();
+            return GetAll<PackageId, PackageEntity>( e => Task.FromResult( new PackageId( e.PartitionKey, e.RowKey ) ) );
+        }
+
+        async Task<IEnumerable<TResult>> GetAll<TResult, TEntity>( Func<TEntity, Task<TResult>> map )
+            where TEntity : ITableEntity, new()
+        {
+            TableQuery<TEntity> query = new TableQuery<TEntity>();
             TableContinuationToken continuationToken = null;
-            List<PackageId> packageIds = new List<PackageId>();
+            List<TResult> result = new List<TResult>();
             do
             {
-                TableQuerySegment<PackageEntity> s = await PackageTable.ExecuteQuerySegmentedAsync( query, continuationToken );
+                TableQuerySegment<TEntity> s = await PackageTable.ExecuteQuerySegmentedAsync( query, continuationToken );
                 continuationToken = s.ContinuationToken;
-                foreach( PackageEntity e in s.Results ) packageIds.Add( new PackageId( e.PartitionKey, e.RowKey ) );
+                foreach( TEntity e in s.Results ) result.Add( await map( e ) );
             } while( continuationToken != null );
 
-            return packageIds;
+            return result;
         }
 
         public Task<IEnumerable<PackageId>> GetPackageIds( PackageSegment segment )
