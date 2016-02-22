@@ -28,9 +28,11 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                     this.http = http;
                 }
                 GraphComponent.prototype.ngOnInit = function () {
+                    var _this = this;
                     this.root = this._routeParams.get('name');
                     this.http.get('request/RootPackage/' + this.root)
-                        .subscribe(function (data) { return console.log(data); }, function (err) { return console.log(err); });
+                        .toPromise()
+                        .then(function (data) { return _this.Data = new DOMParser().parseFromString(data.text(), "text/xml"); });
                 };
                 GraphComponent.prototype.LoadGraph = function (cy) {
                     if (typeof this.cyObj == 'undefined') {
@@ -84,20 +86,15 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                             wheelSensitivity: 1,
                             pixelRatio: 'auto',
                         });
-                        this.cyObj.add({
-                            group: "nodes",
-                            data: { id: '1', name: this.Data },
-                            position: { x: 50, y: 100 }
-                        });
-                        this.cyObj.add({
-                            group: "nodes",
-                            data: { id: '2', name: "Root of doom de l'apocalypse" },
-                            position: { x: 200, y: 200 }
-                        });
-                        this.cyObj.add({
-                            group: "edges",
-                            data: { source: '1', target: '2' }
-                        });
+                        for (var i = 0; i < this.Data.getElementsByTagName("VPackageInfo").length; i++) {
+                            this.cyObj.add({
+                                group: "nodes",
+                                data: {
+                                    id: i, name: this.Data.getElementsByTagName("VPackageInfo")[i].getAttribute("Id")
+                                },
+                                position: { x: 0, y: i * 100 }
+                            });
+                        }
                     }
                 };
                 GraphComponent = __decorate([

@@ -1,9 +1,9 @@
-﻿<div (mouseover)="LoadGraph(cy)">
+﻿<div (click)="LoadGraph(cy)">
     <h1>Graph of : {{root}}</h1>
     <div class="container graph">
         <div class="btn-graph">
             <button class="btn" [routerLink]="['Roots']">Retour</button>
         </div>
-        <div id="cy" #cy>Loading...</div>
+        <div id="cy" #cy>Click here</div>
     </div>
 </div>

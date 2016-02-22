@@ -1,4 +1,4 @@
-import {Component, OnInit} from 'angular2/core';
+import {Component} from 'angular2/core';
 import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
 import {RootsComponent} from './roots.Component';
 import {RootService} from './root.Service';
@@ -23,14 +23,5 @@ import {GraphComponent} from './graph.component';
     { path: '/Graph', name: 'Graph', component: GraphComponent }
 ])
 
-export class AppComponent implements OnInit {
-    ROOTS: Root[];
-    FEEDS: Feed[];
-
-    constructor(private _rootService: RootService, private _feedService: FeedService) { }
-
-    ngOnInit() {
-        this.ROOTS = this._rootService.getRoots();
-        this.FEEDS = this._feedService.getFeeds();
-    }
+export class AppComponent {
 }

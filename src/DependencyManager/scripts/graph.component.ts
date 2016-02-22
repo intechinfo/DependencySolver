@@ -13,7 +13,7 @@ declare var cytoscape: any
 export class GraphComponent implements OnInit {
 
     cyObj: any
-    Data: JSON
+    Data: XMLDocument
     public root: string
 
     constructor(private _routeParams: RouteParams, public http: Http) { }
@@ -22,10 +22,8 @@ export class GraphComponent implements OnInit {
         this.root = this._routeParams.get('name');
 
         this.http.get('request/RootPackage/' + this.root)
-            .subscribe(
-                data => console.log(data),
-                err => console.log(err)
-            );
+            .toPromise()
+            .then(data => this.Data = new DOMParser().parseFromString(data.text(), "text/xml"))
     }
 
     LoadGraph(cy: HTMLDivElement) {
@@ -88,22 +86,32 @@ export class GraphComponent implements OnInit {
                 pixelRatio: 'auto',
             });
 
-            this.cyObj.add({
-                group: "nodes",
-                data: { id: '1', name: this.Data },
-                position: { x: 50, y: 100 }
-            });
+            for (var i = 0; i < this.Data.getElementsByTagName("VPackageInfo").length; i++) {
+                this.cyObj.add({
+                    group: "nodes",
+                    data: {
+                        id: i, name: this.Data.getElementsByTagName("VPackageInfo")[i].getAttribute("Id")
+                    },
+                    position: { x: 0, y: i * 100 }
+                });
 
-            this.cyObj.add({
-                group: "nodes",
-                data: { id: '2', name: "Root of doom de l'apocalypse" },
-                position: { x: 200, y: 200 }
-            });
+                //this.cyObj.add({
+                //    group: "nodes",
+                //    data: { id: '1', name: this.Data },
+                //    position: { x: 50, y: 100 }
+                //});
 
-            this.cyObj.add({
-                group: "edges",
-                data: { source: '1', target: '2' }
-            });
+                //this.cyObj.add({
+                //    group: "nodes",
+                //    data: { id: '2', name: "Root of doom de l'apocalypse" },
+                //    position: { x: 200, y: 200 }
+                //});
+
+                //this.cyObj.add({
+                //    group: "edges",
+                //    data: { source: '1', target: '2' }
+                //});
+            }
         }
     }
 }

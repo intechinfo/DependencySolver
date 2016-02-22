@@ -53,7 +53,7 @@ System.register(['angular2/core', 'angular2/router', './root.Service', './feed.S
                 RootFormComponent.prototype.ngOnInit = function () {
                     var GetType = this.params.get('type');
                     var GetUrl = this.params.get('url');
-                    this.ROOTS = this._rootService.getRoots();
+                    //this.ROOTS = this._rootService.getRoots();
                     this.FEEDS = this._feedService.getFeeds();
                 };
                 RootFormComponent = __decorate([

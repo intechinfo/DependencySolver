@@ -30,6 +30,7 @@ System.register(['angular2/core', 'angular2/http', 'angular2/router', './root.Se
                     this._rootService = _rootService;
                     this._router = _router;
                     this.http = http;
+                    this.ROOTS = [];
                     this.SelectRoot = "";
                 }
                 RootsComponent.prototype.ConfSelect = function (root, conf, tab) {
@@ -46,7 +47,21 @@ System.register(['angular2/core', 'angular2/http', 'angular2/router', './root.Se
                     conf.hidden = true;
                     tab.hidden = false;
                 };
-                RootsComponent.prototype.ngOnInit = function () { this.ROOTS = this._rootService.getRoots(); };
+                RootsComponent.prototype.FillROOTS = function () {
+                    var _this = this;
+                    this._rootService.getRoots().then(function (data) {
+                        var root;
+                        for (var i = 0; i < data.json().length; i++) {
+                            root = { "type": data.json()[i][1], "name": data.json()[i][0], "feed": null };
+                            if (data.json()[i][0] === "System.Collections") {
+                                _this.ROOTS.push(root);
+                            }
+                        }
+                    });
+                };
+                RootsComponent.prototype.ngOnInit = function () {
+                    this.FillROOTS();
+                };
                 RootsComponent = __decorate([
                     core_1.Component({
                         selector: 'router-outlet',

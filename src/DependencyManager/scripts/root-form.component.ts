@@ -47,7 +47,7 @@ export class RootFormComponent implements OnInit {
         let GetType = this.params.get('type');
         let GetUrl = this.params.get('url');
 
-        this.ROOTS = this._rootService.getRoots();
+        //this.ROOTS = this._rootService.getRoots();
         this.FEEDS = this._feedService.getFeeds();
     }
 }

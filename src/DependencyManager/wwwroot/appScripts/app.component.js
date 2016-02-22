@@ -38,14 +38,8 @@ System.register(['angular2/core', 'angular2/router', './roots.Component', './roo
             }],
         execute: function() {
             AppComponent = (function () {
-                function AppComponent(_rootService, _feedService) {
-                    this._rootService = _rootService;
-                    this._feedService = _feedService;
+                function AppComponent() {
                 }
-                AppComponent.prototype.ngOnInit = function () {
-                    this.ROOTS = this._rootService.getRoots();
-                    this.FEEDS = this._feedService.getFeeds();
-                };
                 AppComponent = __decorate([
                     core_1.Component({
                         selector: 'my-app',
@@ -59,7 +53,7 @@ System.register(['angular2/core', 'angular2/router', './roots.Component', './roo
                         { path: '/AddFeed', name: 'AddFeed', component: feed_form_component_1.FeedFormComponent },
                         { path: '/Graph', name: 'Graph', component: graph_component_1.GraphComponent }
                     ]), 
-                    __metadata('design:paramtypes', [root_Service_1.RootService, feed_Service_1.FeedService])
+                    __metadata('design:paramtypes', [])
                 ], AppComponent);
                 return AppComponent;
             })();

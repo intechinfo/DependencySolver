@@ -13,7 +13,7 @@ import {RootService} from './root.Service';
 })
 
 export class RootsComponent implements OnInit {
-    ROOTS: Root[];
+    ROOTS: Root[] = [];
     public SelectRoot = "";
 
     constructor(private _rootService: RootService, private _router: Router, public http: Http) { }
@@ -41,5 +41,20 @@ export class RootsComponent implements OnInit {
         tab.hidden = false;
     }
 
-    ngOnInit() { this.ROOTS = this._rootService.getRoots(); }
+    FillROOTS() {
+        this._rootService.getRoots().then(data => {
+            var root: Root
+            for (var i = 0; i < data.json().length; i++) {
+                root = { "type": data.json()[i][1], "name": data.json()[i][0], "feed": null };
+
+                if (data.json()[i][0] === "System.Collections") {
+                    this.ROOTS.push(root);
+                }
+            }
+        })
+    }
+
+    ngOnInit() {
+        this.FillROOTS();
+    }
 }

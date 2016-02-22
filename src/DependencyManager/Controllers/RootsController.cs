@@ -37,26 +37,26 @@ namespace DependencyManager.Controllers
         }
 
         [HttpGet("RootPackage/{name}")]
-        public async Task<JsonResult> GetRootPackage(string name)
+        public async Task<string> GetRootPackage(string name)
         {
             PackageId packageId = new PackageId(PackageId.NuGet, name);
 
             Package package = await _packRepo.GetPackageById(packageId);
 
-            //string XmlLastRelease = "";
-            //string XmlLastPreRelease = "";
+            string XmlLastRelease = "";
+            string XmlLastPreRelease = "";
 
-            //if (package.LastRelease != null)
-            //{
-            //    XmlLastRelease = _packSeria.Serialize(package.LastRelease);
-            //}
+            if (package.LastRelease != null)
+            {
+                XmlLastRelease = _packSeria.Serialize(package.LastRelease);
+            }
 
-            //if(package.LastPreRelease != null)
-            //{
-            //    XmlLastPreRelease = _packSeria.Serialize(package.LastPreRelease);
-            //}
+            if (package.LastPreRelease != null)
+            {
+                XmlLastPreRelease = _packSeria.Serialize(package.LastPreRelease);
+            }
 
-            return new JsonResult(package);
+            return XmlLastRelease;
         }
     }
 }
