@@ -50,10 +50,22 @@ System.register(['angular2/core', 'angular2/router', './root.Service', './feed.S
                 RootFormComponent.prototype.onselect = function (type) {
                     this.FEEDS = this._feedService.getSpecificFeeds(type.value);
                 };
+                RootFormComponent.prototype.FillROOTS = function () {
+                    var _this = this;
+                    this._rootService.getRoots().then(function (data) {
+                        var root;
+                        for (var i = 0; i < data.json().length; i++) {
+                            root = { "type": data.json()[i][1], "name": data.json()[i][0], "feed": null };
+                            if (data.json()[i][0] === "System.Collections") {
+                                _this.ROOTS.push(root);
+                            }
+                        }
+                    });
+                };
                 RootFormComponent.prototype.ngOnInit = function () {
                     var GetType = this.params.get('type');
                     var GetUrl = this.params.get('url');
-                    //this.ROOTS = this._rootService.getRoots();
+                    this.FillROOTS();
                     this.FEEDS = this._feedService.getFeeds();
                 };
                 RootFormComponent = __decorate([

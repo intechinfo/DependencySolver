@@ -33,8 +33,8 @@ export class RootsComponent implements OnInit {
     DelSelect(resp: boolean, conf: HTMLDivElement, tab: HTMLTableElement)
     {
         if (resp) {
-            //var indx = this.ROOTS.map(function (e) { return e.name }).indexOf(this.SelectRoot);
-            //this.ROOTS.splice(indx, 1);
+            var indx = this.ROOTS.map(function (e) { return e.name }).indexOf(this.SelectRoot);
+            this.ROOTS.splice(indx, 1);
         }
 
         conf.hidden = true;
@@ -47,9 +47,9 @@ export class RootsComponent implements OnInit {
             for (var i = 0; i < data.json().length; i++) {
                 root = { "type": data.json()[i][1], "name": data.json()[i][0], "feed": null };
 
-                if (data.json()[i][0] === "System.Collections") {
+                //if (data.json()[i][0] === "System.Collections") {
                     this.ROOTS.push(root);
-                }
+                //}
             }
         })
     }

@@ -112,7 +112,7 @@ namespace Invenietis.DependencyCrawler.IO
                 i =>
                 {
                     string[] keyParts = i.RowKey.Split( '|' );
-                    return new VPackageId( segment.PackageManager, keyParts[ 0 ], keyParts[ 1 ] );
+                    return new VPackageId( segment.PackageManager, keyParts[0], keyParts[1] );
                 } );
         }
 
@@ -147,7 +147,7 @@ namespace Invenietis.DependencyCrawler.IO
                 i =>
                 {
                     string[] keyParts = i.RowKey.Split( '|' );
-                    return new VPackageId( segment.PackageManager, keyParts[ 0 ], keyParts[ 1 ] );
+                    return new VPackageId( segment.PackageManager, keyParts[0], keyParts[1] );
                 } );
         }
 
@@ -274,46 +274,73 @@ namespace Invenietis.DependencyCrawler.IO
             return Tuple.Create( true, result );
         }
 
+        public async Task<IReadOnlyDictionary<PackageId, CombinedVPackageId>> GetLastVersionsOf( IEnumerable<PackageId> packageIds )
+        {
+            Dictionary<PackageId, CombinedVPackageId> lastVersions = new Dictionary<PackageId, CombinedVPackageId>();
+
+            foreach( PackageId packageId in packageIds )
+            {
+                TableOperation retrieve = TableOperation.Retrieve<PackageEntity>(packageId.PackageManager, packageId.Value);
+                TableResult tableResult = await PackageTable.ExecuteAsync(retrieve);
+                PackageEntity entity = (PackageEntity)tableResult.Result;
+
+                CombinedVPackageId combinedVPackageId = new CombinedVPackageId();
+                if( entity.LastRelease != null )
+                {
+                    combinedVPackageId.Release = entity.LastRelease;
+                }
+
+                if( entity.LastPreRelease != null )
+                {
+                    combinedVPackageId.PreRelease = entity.LastPreRelease;
+                }
+
+                lastVersions[packageId] = combinedVPackageId;
+            }
+
+            return lastVersions;
+        }
+
         CloudStorageAccount _cloudStorageAccount;
         CloudStorageAccount CloudStorageAccount
         {
-            get { return _cloudStorageAccount ?? ( _cloudStorageAccount = CloudStorageAccount.Parse( _connectionString ) ); }
+            get { return _cloudStorageAccount ?? (_cloudStorageAccount = CloudStorageAccount.Parse( _connectionString )); }
         }
 
         CloudTableClient _cloudTableClient;
         CloudTableClient CloudTableClient
         {
-            get { return _cloudTableClient ?? ( _cloudTableClient = CloudStorageAccount.CreateCloudTableClient() ); }
+            get { return _cloudTableClient ?? (_cloudTableClient = CloudStorageAccount.CreateCloudTableClient()); }
         }
 
         CloudTable _packageTable;
         CloudTable PackageTable
         {
-            get { return _packageTable ?? ( _packageTable = CloudTableClient.GetTableReference( _packageTableName ) ); }
+            get { return _packageTable ?? (_packageTable = CloudTableClient.GetTableReference( _packageTableName )); }
         }
 
         CloudTable _vPackageTable;
         CloudTable VPackageTable
         {
-            get { return _vPackageTable ?? ( _vPackageTable = CloudTableClient.GetTableReference( _vPackageTableName ) ); }
+            get { return _vPackageTable ?? (_vPackageTable = CloudTableClient.GetTableReference( _vPackageTableName )); }
         }
 
         CloudTable _notCrawledVPackageTable;
         CloudTable NotCrawledVPackageTable
         {
-            get { return _notCrawledVPackageTable ?? ( _notCrawledVPackageTable = CloudTableClient.GetTableReference( _notCrawledTableName ) ); }
+            get { return _notCrawledVPackageTable ?? (_notCrawledVPackageTable = CloudTableClient.GetTableReference( _notCrawledTableName )); }
         }
 
         CloudBlobClient _cloudBlobClient;
         CloudBlobClient CloudBlobClient
         {
-            get { return _cloudBlobClient ?? ( _cloudBlobClient = CloudStorageAccount.CreateCloudBlobClient() ); }
+            get { return _cloudBlobClient ?? (_cloudBlobClient = CloudStorageAccount.CreateCloudBlobClient()); }
         }
 
         CloudBlobContainer _cloudBlobContainer;
         CloudBlobContainer CloudBlobContainer
         {
-            get { return _cloudBlobContainer ?? ( _cloudBlobContainer = CloudBlobClient.GetContainerReference( _vPackageCacheBlobContainerName ) ); }
+            get { return _cloudBlobContainer ?? (_cloudBlobContainer = CloudBlobClient.GetContainerReference( _vPackageCacheBlobContainerName )); }
         }
 
         IPackageSerializer _packageSerializer;

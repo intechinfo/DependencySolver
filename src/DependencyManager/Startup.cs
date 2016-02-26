@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNet.Mvc;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using Microsoft.AspNet.Mvc.Formatters;
 
 namespace DependencyManager
 {
@@ -29,6 +30,12 @@ namespace DependencyManager
             });
 
             services.AddMvc();
+
+            services.Configure<MvcOptions>(o =>
+            {
+                o.InputFormatters.Add(new XmlSerializerInputFormatter());
+                o.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+            });
             
             IConfigurationRoot config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")

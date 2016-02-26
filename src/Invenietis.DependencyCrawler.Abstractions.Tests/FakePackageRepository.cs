@@ -124,6 +124,11 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             return _packages.Select( p => p.Key );
         }
 
+        public Task<IReadOnlyDictionary<PackageId, IEnumerable<VPackageId>>> GetLastVersionsOf(IEnumerable<PackageId> listPackages)
+        {
+            throw new NotSupportedException();
+        }
+
 #pragma warning restore 1998
 
     }

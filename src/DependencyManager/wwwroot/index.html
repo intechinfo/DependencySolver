@@ -16,6 +16,8 @@
     <script src="libs/router.dev.js"></script>
     <script src="libs/cytoscape.js"></script>
     <script src="libs/http.dev.js"></script>
+    <script src="libs/dagre.js"></script>
+    <script src="libs/cytoscape-dagre.js"></script>
 
     <!-- 2. Configure SystemJS -->
     <script>
@@ -32,6 +34,10 @@
 
         System.import('appScripts/boot')
               .then(null, console.error.bind(console));
+    </script>
+    <script>
+        function disableF5(e) { if ((e.which || e.keyCode) == 116) e.preventDefault(); };
+        document.addEventListener("keydown", disableF5, false);
     </script>
 </head>
 <body>

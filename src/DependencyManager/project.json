@@ -10,6 +10,7 @@
     "Microsoft.AspNet.Server.Kestrel": "1.0.0-rc1-final",
     "Microsoft.AspNet.StaticFiles": "1.0.0-rc1-final",
     "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
+    "Microsoft.AspNet.Mvc.Formatters.Xml": "6.0.0-rc1-final",
     "Invenietis.DependencyCrawler.Core": "0.0.0-Absolutely-Invalid",
     "Invenietis.DependencyCrawler.Abstractions": "0.0.0-Absolutely-Invalid",
     "Newtonsoft.Json": "8.0.2"

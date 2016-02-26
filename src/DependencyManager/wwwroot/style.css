@@ -6,9 +6,9 @@
     color: white;
 }
 
-#cy {
-    width: 1000px;
-    height: 600px;
+.cy {
+    width: 1500px;
+    height: 750px;
     display: block;
     margin: auto;
     border-style: solid;
@@ -18,6 +18,12 @@
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-spacing: initial;
+}
+
+.load{
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .successDiv {
@@ -67,7 +73,7 @@ fieldset {
 
 .graph {
     width: auto !important;
-    left: -500px !important;
+    left: -750px !important;
 }
 
 select {

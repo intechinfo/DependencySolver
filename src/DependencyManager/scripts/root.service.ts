@@ -14,7 +14,6 @@ export class RootService {
     constructor(public http: Http) { }
 
     getRoots() {
-
         return this.http.get('request/listRoots').toPromise();
     }
 }

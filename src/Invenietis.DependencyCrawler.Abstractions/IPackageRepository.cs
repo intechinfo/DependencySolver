@@ -27,5 +27,7 @@ namespace Invenietis.DependencyCrawler.Abstractions
         Task AddDependenciesIfNotExists( VPackageId vPackageId, IReadOnlyDictionary<PlatformId, IEnumerable<VPackageId>> dependencies );
 
         Task<Package> GetPackageById( PackageId packageId );
+
+        Task<IReadOnlyDictionary<PackageId, CombinedVPackageId>> GetLastVersionsOf(IEnumerable<PackageId> PackageIds);
     }
 }

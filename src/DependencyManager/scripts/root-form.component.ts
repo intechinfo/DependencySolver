@@ -19,7 +19,9 @@ export class RootFormComponent implements OnInit {
     selectedType: string;
     public GetName = this.params.get('name');
 
-    constructor(private _rootService: RootService, private _feedService: FeedService, router: Router, private params: RouteParams) { this.router = router; }
+    constructor(private _rootService: RootService, private _feedService: FeedService, router: Router, private params: RouteParams) {
+        this.router = router;
+    }
 
     onSubmit(name: HTMLInputElement, type: HTMLInputElement, feed: HTMLInputElement, successDiv: HTMLDivElement) {
         this.newRoot = { "type": type.value, "name": name.value, "feed": feed.value }
@@ -43,11 +45,24 @@ export class RootFormComponent implements OnInit {
         this.FEEDS = this._feedService.getSpecificFeeds(type.value);
     }
 
+    FillROOTS() {
+        this._rootService.getRoots().then(data => {
+            var root: Root
+            for (var i = 0; i < data.json().length; i++) {
+                root = { "type": data.json()[i][1], "name": data.json()[i][0], "feed": null };
+
+                if (data.json()[i][0] === "System.Collections") {
+                    this.ROOTS.push(root);
+                }
+            }
+        })
+    }
+
     ngOnInit() {
         let GetType = this.params.get('type');
         let GetUrl = this.params.get('url');
 
-        //this.ROOTS = this._rootService.getRoots();
+        this.FillROOTS();
         this.FEEDS = this._feedService.getFeeds();
     }
 }

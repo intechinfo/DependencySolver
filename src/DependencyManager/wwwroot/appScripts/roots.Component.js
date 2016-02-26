@@ -43,6 +43,8 @@ System.register(['angular2/core', 'angular2/http', 'angular2/router', './root.Se
                 };
                 RootsComponent.prototype.DelSelect = function (resp, conf, tab) {
                     if (resp) {
+                        var indx = this.ROOTS.map(function (e) { return e.name; }).indexOf(this.SelectRoot);
+                        this.ROOTS.splice(indx, 1);
                     }
                     conf.hidden = true;
                     tab.hidden = false;
@@ -53,9 +55,8 @@ System.register(['angular2/core', 'angular2/http', 'angular2/router', './root.Se
                         var root;
                         for (var i = 0; i < data.json().length; i++) {
                             root = { "type": data.json()[i][1], "name": data.json()[i][0], "feed": null };
-                            if (data.json()[i][0] === "System.Collections") {
-                                _this.ROOTS.push(root);
-                            }
+                            //if (data.json()[i][0] === "System.Collections") {
+                            _this.ROOTS.push(root);
                         }
                     });
                 };

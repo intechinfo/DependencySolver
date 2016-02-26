@@ -6,6 +6,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Invenietis.DependencyCrawler.IO;
+using System.IO;
+using System.Xml.Serialization;
+using System;
+using DependencyManager.Models;
 
 namespace DependencyManager.Controllers
 {
@@ -56,7 +60,20 @@ namespace DependencyManager.Controllers
                 XmlLastPreRelease = _packSeria.Serialize(package.LastPreRelease);
             }
 
-            return XmlLastRelease;
+            return "<VPackages>" + XmlLastRelease + "\n" + XmlLastPreRelease + "<VPackages>";
+        }
+
+        [HttpPost("ListVersions")]
+        public async Task<List<PackageLastVersion>> GetListVersions([FromBody] PackageId[] listPackages)
+        {
+            IReadOnlyDictionary<PackageId, CombinedVPackageId> lastVersions = await _packRepo.GetLastVersionsOf(listPackages);
+
+            return lastVersions.Select(kv => new PackageLastVersion
+            {
+                Id = kv.Key.Value,
+                PackageManager = kv.Key.PackageManager,
+                LastVersions = kv.Value
+            }).ToList();
         }
     }
 }
