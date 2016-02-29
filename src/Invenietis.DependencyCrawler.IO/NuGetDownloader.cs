@@ -53,7 +53,7 @@ namespace Invenietis.DependencyCrawler.IO
             var dependencies = package.DependencySets
                 .Select( s => new
                 {
-                    PlatformId = new PlatformId( s.TargetFramework.FullName ),
+                    PlatformId = s.TargetFramework != null ? new PlatformId( s.TargetFramework.FullName ) : PlatformId.None,
                     VPackageIds = s.Dependencies.Select( d => new VPackageId( PackageId.NuGet, d.Id, d.VersionSpec.MinVersion.ToString() ) )
                 } )
                 .ToDictionary( x => x.PlatformId, x => x.VPackageIds );
