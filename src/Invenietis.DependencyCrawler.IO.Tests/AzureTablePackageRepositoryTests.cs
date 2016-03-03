@@ -17,9 +17,10 @@ namespace Invenietis.DependencyCrawler.Tests
             string connectionString = configuration[ "Data:AzureStorage:ConnectionString" ];
             string packageTable = configuration[ "Data:AzureStorage:PackageTable" ];
             string vPackageTable = configuration[ "Data:AzureStorage:VPackageTable" ];
+            string validateNodesTable = configuration[ "Data:AzureStorage:ValidateNodesTable" ];
             string notCrawledVPackageTable = configuration[ "Data:AzureStorage:NotCrawledVPackageTable" ];
             string vPackageCacheBlobContainer = configuration[ "Data:AzureStorage:VPackageCacheBlobContainer" ];
-            return new AzureTablePackageRepository( connectionString, packageTable, vPackageTable, notCrawledVPackageTable, vPackageCacheBlobContainer );
+            return new AzureTablePackageRepository( connectionString, packageTable, vPackageTable, validateNodesTable, notCrawledVPackageTable, vPackageCacheBlobContainer );
         }
     }
 }

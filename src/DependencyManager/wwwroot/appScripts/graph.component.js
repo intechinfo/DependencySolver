@@ -26,6 +26,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                 function GraphComponent(_routeParams, http) {
                     this._routeParams = _routeParams;
                     this.http = http;
+                    this.Exceptions = [];
                 }
                 GraphComponent.prototype.ngOnInit = function () {
                     var _this = this;
@@ -33,7 +34,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                     this.http.get('request/RootPackage/' + this.root)
                         .toPromise()
                         .then(function (data) {
-                        _this.Data = new DOMParser().parseFromString(data.text(), "text/xml");
+                        _this.xmlDependencies = new DOMParser().parseFromString(data.text(), "text/xml");
                         _this.InitGraph(document.getElementsByClassName("cy")[0]);
                     });
                 };
@@ -68,8 +69,8 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                             })
                                 .selector('.base')
                                 .css({
-                                'width': '200px',
-                                'height': '200px',
+                                'width': '150px',
+                                'height': '150px',
                                 'shape': 'rectangle'
                             })
                                 .selector('.platform')
@@ -77,6 +78,34 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                                 'width': '75px',
                                 'height': '75px',
                                 'shape': 'triangle'
+                            })
+                                .selector('.outDated')
+                                .css({
+                                'background-color': '#FF0000',
+                                'text-outline-color': '#FF0000',
+                                'line-color': '#FF0000',
+                                'target-arrow-color': '#FF0000'
+                            })
+                                .selector('.outDatedDepend')
+                                .css({
+                                'background-color': '#FF0000',
+                                'text-outline-color': '#FF0000',
+                                'line-color': '#FF0000',
+                                'target-arrow-color': '#FF0000'
+                            })
+                                .selector('.outDatedNotified')
+                                .css({
+                                'background-color': '#e89c03',
+                                'text-outline-color': '#FFA148',
+                            })
+                                .selector('.partialValidate')
+                                .css({
+                                'background-color': '#ffffff',
+                                'text-outline-color': '#ffffff',
+                            })
+                                .selector('.hide')
+                                .css({
+                                'display': 'none'
                             }),
                             // interaction options:
                             minZoom: 0.1,
@@ -107,16 +136,49 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                     }
                 };
                 GraphComponent.prototype.LoadGraph = function () {
-                    var racc = [this.Data.getElementsByTagName("VPackage")[0]
+                    var _this = this;
+                    var racc = [this.xmlDependencies.getElementsByTagName("VPackage")[0]
                             .getElementsByTagName("VPackageInfo")];
-                    if (this.Data.getElementsByTagName("VPackage")[1] != undefined) {
-                        racc.push(this.Data.getElementsByTagName("VPackage")[1]
+                    if (this.xmlDependencies.getElementsByTagName("VPackage")[1] != undefined) {
+                        racc.push(this.xmlDependencies.getElementsByTagName("VPackage")[1]
                             .getElementsByTagName("VPackageInfo"));
                     }
                     var integralityDep = [];
                     for (var j = 0; j < racc.length; j++) {
                         var listVPack = [racc[j][0]];
                         var listDep = [];
+                        if (this.cyObj.getElementById(listVPack[0].getAttribute('Id')).length == 0) {
+                            this.cyObj.add({
+                                group: "nodes",
+                                data: {
+                                    id: listVPack[0].getAttribute('Id'),
+                                    name: listVPack[0].getAttribute("Id")
+                                },
+                                classes: "base initial"
+                            });
+                            var initial = this.cyObj.nodes().filter(function () {
+                                return this.hasClass('initial');
+                            });
+                            initial.on('click', function (e) {
+                                var actuallyHide = _this.cyObj.elements().filter(function () {
+                                    return this.hasClass('hide');
+                                });
+                                if (actuallyHide.length == 0) {
+                                    var route = _this.cyObj.elements().filter(function () {
+                                        return this.hasClass('outDated');
+                                    });
+                                    if (route.length != 0) {
+                                        var greenEle = _this.cyObj.elements().filter(function () {
+                                            return !this.hasClass('outDated') && !this.hasClass('outDatedDepend');
+                                        });
+                                        greenEle.addClass('hide');
+                                    }
+                                }
+                                else {
+                                    actuallyHide.removeClass('hide');
+                                }
+                            });
+                        }
                         for (var i = 0; i < listVPack.length; i++) {
                             if (this.cyObj.getElementById(listVPack[i].getAttribute('Id') + listVPack[i].getAttribute('Version')).length == 0) {
                                 this.cyObj.add({
@@ -126,6 +188,14 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                                         name: listVPack[i].getAttribute("Id") + "\n" + listVPack[i].getAttribute('Version')
                                     },
                                     classes: "base"
+                                });
+                                this.cyObj.add({
+                                    group: "edges",
+                                    data: {
+                                        id: listVPack[0].getAttribute('Id') + listVPack[i].getAttribute('Id') + listVPack[i].getAttribute('Version'),
+                                        source: listVPack[0].getAttribute('Id'),
+                                        target: listVPack[i].getAttribute('Id') + listVPack[i].getAttribute('Version')
+                                    }
                                 });
                             }
                             if (i == listVPack.length - 1) {
@@ -169,17 +239,25 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                                 .getAttribute("Id").split(',')[0] +
                                 racc.getElementsByTagName("Platform")[i]
                                     .getAttribute("Id").split('=')[1] + src).length == 0) {
+                                var infoId = racc.getElementsByTagName("Platform")[i]
+                                    .getAttribute("Id").split(',')[0] +
+                                    racc.getElementsByTagName("Platform")[i]
+                                        .getAttribute("Id").split('=')[1] + src;
+                                var infoName = racc.getElementsByTagName("Platform")[i]
+                                    .getAttribute("Id");
+                                if (infoName == "") {
+                                    infoName = "All platforms";
+                                }
+                                else {
+                                    infoName = infoName.split(',')[0] + "\n" +
+                                        racc.getElementsByTagName("Platform")[i]
+                                            .getAttribute("Id").split('=')[1];
+                                }
                                 this.cyObj.add({
                                     group: "nodes",
                                     data: {
-                                        id: racc.getElementsByTagName("Platform")[i]
-                                            .getAttribute("Id").split(',')[0] +
-                                            racc.getElementsByTagName("Platform")[i]
-                                                .getAttribute("Id").split('=')[1] + src,
-                                        name: racc.getElementsByTagName("Platform")[i]
-                                            .getAttribute("Id").split(',')[0] + "\n" +
-                                            racc.getElementsByTagName("Platform")[i]
-                                                .getAttribute("Id").split('=')[1]
+                                        id: infoId,
+                                        name: infoName
                                     },
                                     classes: "platform"
                                 });
@@ -212,6 +290,12 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                                     racc.getElementsByTagName("Platform")[i]
                                         .getElementsByTagName("Dependency")[j]
                                         .getAttribute("Version")).length == 0) {
+                                    var isRelease = "released";
+                                    if (racc.getElementsByTagName("Platform")[i]
+                                        .getElementsByTagName("Dependency")[j]
+                                        .getAttribute("Version").includes("-")) {
+                                        isRelease = "prereleased";
+                                    }
                                     this.cyObj.add({
                                         group: "nodes",
                                         data: {
@@ -226,8 +310,20 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                                                 .getAttribute("Id") + "\nv" +
                                                 racc.getElementsByTagName("Platform")[i]
                                                     .getElementsByTagName("Dependency")[j]
-                                                    .getAttribute("Version")
-                                        }
+                                                    .getAttribute("Version"),
+                                            package: racc.getElementsByTagName("Platform")[i]
+                                                .getElementsByTagName("Dependency")[j]
+                                                .getAttribute("Id"),
+                                            version: racc.getElementsByTagName("Platform")[i]
+                                                .getElementsByTagName("Dependency")[j]
+                                                .getAttribute("Version")
+                                        },
+                                        classes: racc.getElementsByTagName("Platform")[i]
+                                            .getElementsByTagName("Dependency")[j]
+                                            .getAttribute("Id") + " " +
+                                            racc.getElementsByTagName("Platform")[i]
+                                                .getElementsByTagName("Dependency")[j]
+                                                .getAttribute("Version") + " " + isRelease
                                     });
                                 }
                                 if (this.cyObj.getElementById(racc.getElementsByTagName("Platform")[i]
@@ -285,7 +381,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                             nbr++;
                         }
                     }
-                    var racc = this.Data.getElementsByTagName("VPackage")[0]
+                    var racc = this.xmlDependencies.getElementsByTagName("VPackage")[0]
                         .getElementsByTagName("VPackageInfo");
                     for (var i = 0; i < tempList.length; i++) {
                         for (var j = 0; j < racc.length; j++) {
@@ -297,6 +393,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                     return tempList;
                 };
                 GraphComponent.prototype.UpdateVersion = function (listDep) {
+                    var _this = this;
                     var newListDep = [];
                     for (var i = 0; i < listDep.length; i++) {
                         var trouve = false;
@@ -314,7 +411,117 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                     this.http.post('request/ListVersions/', JSON.stringify(newListDep), options)
                         .toPromise()
                         .then(function (data) {
+                        _this.xmlLastVersions = new DOMParser().parseFromString(data.text(), "text/xml");
+                    })
+                        .then(function (x) {
+                        var racc = _this.xmlLastVersions;
+                        _this.cyObj.nodes()
+                            .filter(function () {
+                            return !this.hasClass("platform") && !this.hasClass("base");
+                        })
+                            .filter(function () {
+                            for (var j = 0; j < racc.getElementsByTagName('PackageLastVersion').length; j++) {
+                                if (this.hasClass(racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('Id')[0].childNodes[0].nodeValue)) {
+                                    if (this.hasClass("released")) {
+                                        return !this.hasClass(racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('Release')[0].childNodes[0].nodeValue);
+                                    }
+                                    else if (this.hasClass("prereleased")) {
+                                        return !this.hasClass(racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('PreRelease')[0].childNodes[0].nodeValue);
+                                    }
+                                }
+                            }
+                        })
+                            .addClass('outDated');
+                    })
+                        .then(function (y) {
+                        var headers = new http_1.Headers({ 'Content-Type': 'application/json', 'Accept': 'text/xml' });
+                        var options = new http_1.RequestOptions({ headers: headers });
+                        var data = { "PackageManager": "Nuget", "Value": _this.root };
+                        _this.http.post('request/GetValidateNodes/', JSON.stringify(data), options)
+                            .toPromise()
+                            .then(function (data) {
+                            var xmlValidateNodes = new DOMParser().parseFromString(data.text(), "text/xml");
+                            var ValidateNodes = xmlValidateNodes.getElementsByTagName('ValidateNode');
+                            for (var i = 0; i < ValidateNodes.length; i++) {
+                                var elmnt = _this.cyObj.getElementById(ValidateNodes[i].getAttribute('Id') + ValidateNodes[i].getAttribute('Version'));
+                                _this.Exceptions.push(elmnt);
+                                elmnt.removeClass('outDated');
+                                elmnt.addClass('outDatedNotified');
+                                _this.cyObj.elements().removeClass('outDatedDepend');
+                            }
+                            _this.ChangeAndToggle();
+                        });
                     });
+                };
+                GraphComponent.prototype.ChangeAndToggle = function () {
+                    var _this = this;
+                    var ElemtsOutDated = this.cyObj.elements().filter(function () {
+                        return this.hasClass('outDated') || this.hasClass('outDatedNotified');
+                    });
+                    ElemtsOutDated.on('click', function (e) {
+                        var elemts = _this.cyObj.elements().filter(function () {
+                            return this.hasClass('hide');
+                        });
+                        if (elemts.length == 0) {
+                            var headers = new http_1.Headers({ 'Content-Type': 'application/json', 'Accept': 'text/xml' });
+                            var options = new http_1.RequestOptions({ headers: headers });
+                            var addOrRemove;
+                            if (_this.Exceptions.indexOf(e.cyTarget[0]) == -1) {
+                                _this.Exceptions.push(e.cyTarget[0]);
+                                e.cyTarget[0].removeClass('outDated');
+                                e.cyTarget[0].addClass('outDatedNotified');
+                                _this.cyObj.elements().removeClass('outDatedDepend');
+                                addOrRemove = "Add";
+                            }
+                            else {
+                                e.cyTarget[0].removeClass('outDatedNotified');
+                                e.cyTarget[0].addClass('outDated');
+                                var idxEle = _this.Exceptions.indexOf(e.cyTarget[0]);
+                                _this.Exceptions.splice(idxEle, 1);
+                                addOrRemove = "Remove";
+                            }
+                            var data = { packageId: { "PackageManager": "Nuget", "Value": _this.root }, vPackageId: { "PackageManager": "NuGet", "Id": e.cyTarget[0].data('package'), "Version": e.cyTarget[0].data('version') } };
+                            _this.http.post("request/" + addOrRemove + "ValidateNodes", JSON.stringify(data), options)
+                                .toPromise();
+                            ChangeColor(_this.cyObj, _this.Exceptions);
+                        }
+                    });
+                    ChangeColor(this.cyObj, this.Exceptions);
+                    function ChangeColor(cyObj, Exce) {
+                        var Elemnts = cyObj.elements().filter(function () {
+                            if (Exce != []) {
+                                if (Exce.indexOf(this) == -1) {
+                                    return this.hasClass('outDated');
+                                }
+                            }
+                            else {
+                                return this.hasClass('outDated');
+                            }
+                        });
+                        for (var i = 0; i < Elemnts.length; i++) {
+                            Recursive(Elemnts[i].incomers());
+                        }
+                        function Recursive(list) {
+                            list.addClass('outDatedDepend');
+                            var tree = list.incomers();
+                            if (tree.length != 0) {
+                                Recursive(tree);
+                            }
+                        }
+                        var Package = cyObj.filter(function () {
+                            return this.hasClass('initial');
+                        })[0];
+                        if (Package.hasClass('outDatedDepend') && Package.outgoers().nodes().length > 2) {
+                            if (Package.outgoers().nodes()[0].hasClass('outDatedDepend') || Package.outgoers().nodes()[1].hasClass('outDatedDepend')) {
+                                Package.addClass('partialValidate');
+                            }
+                            else {
+                                if (Package.hasClass('partialValidate')) {
+                                    Package.removeClass('partialValidate');
+                                }
+                            }
+                        }
+                    }
                 };
                 GraphComponent = __decorate([
                     core_1.Component({

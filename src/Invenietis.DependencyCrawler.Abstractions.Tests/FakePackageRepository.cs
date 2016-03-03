@@ -124,7 +124,22 @@ namespace Invenietis.DependencyCrawler.Abstractions.Tests
             return _packages.Select( p => p.Key );
         }
 
-        public Task<IReadOnlyDictionary<PackageId, IEnumerable<VPackageId>>> GetLastVersionsOf(IEnumerable<PackageId> listPackages)
+        public Task<IReadOnlyDictionary<PackageId, CombinedVPackageId>> GetLastVersionsOf(IEnumerable<PackageId> listPackages)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<bool> AddValidateNodes( PackageId package, VPackageId node )
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<bool> RemoveValidateNodes( PackageId package, VPackageId node )
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<string> GetValidateNodes( PackageId package )
         {
             throw new NotSupportedException();
         }

@@ -12,5 +12,7 @@ namespace Invenietis.DependencyCrawler.IO
         string Serialize( IReadOnlyDictionary<PlatformId, IEnumerable<VPackageId>> dependencies );
 
         IReadOnlyDictionary<PlatformId, IEnumerable<VPackageId>> DeserializeVPackageDependencies( string serializedVPackageDependencies );
+
+        string Serialize( IEnumerable<VPackageId> nodes );
     }
 }

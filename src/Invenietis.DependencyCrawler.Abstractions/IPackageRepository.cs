@@ -29,5 +29,11 @@ namespace Invenietis.DependencyCrawler.Abstractions
         Task<Package> GetPackageById( PackageId packageId );
 
         Task<IReadOnlyDictionary<PackageId, CombinedVPackageId>> GetLastVersionsOf(IEnumerable<PackageId> PackageIds);
+
+        Task<bool> AddValidateNodes( PackageId package, VPackageId node);
+
+        Task<bool> RemoveValidateNodes( PackageId package, VPackageId node );
+
+        Task<string> GetValidateNodes( PackageId package );
     }
 }

@@ -15,6 +15,7 @@ namespace Invenietis.DependencyCrawler.IO
         readonly string _connectionString;
         readonly string _packageTableName;
         readonly string _vPackageTableName;
+        readonly string _validateNodesTableName;
         readonly string _notCrawledTableName;
         readonly string _vPackageCacheBlobContainerName;
         readonly TimeSpan _cacheTimeOut;
@@ -23,12 +24,14 @@ namespace Invenietis.DependencyCrawler.IO
             string connectionString,
             string packageTableName,
             string vPackageTableName,
+            string validateNodesTableName,
             string notCrawledTableName,
             string vPackageCacheBlobContainerName )
             : this(
                   connectionString,
                   packageTableName,
                   vPackageTableName,
+                  validateNodesTableName,
                   notCrawledTableName,
                   vPackageCacheBlobContainerName,
                   TimeSpan.FromMinutes( 2 ) )
@@ -39,6 +42,7 @@ namespace Invenietis.DependencyCrawler.IO
             string connectionString,
             string packageTableName,
             string vPackageTableName,
+            string validateNodesTableName,
             string notCrawledTableName,
             string vPackageCacheBlobContainerName,
             TimeSpan cacheTimeOut )
@@ -46,6 +50,7 @@ namespace Invenietis.DependencyCrawler.IO
             _connectionString = connectionString;
             _packageTableName = packageTableName;
             _vPackageTableName = vPackageTableName;
+            _validateNodesTableName = validateNodesTableName;
             _notCrawledTableName = notCrawledTableName;
             _vPackageCacheBlobContainerName = vPackageCacheBlobContainerName;
             _cacheTimeOut = cacheTimeOut;
@@ -298,6 +303,52 @@ namespace Invenietis.DependencyCrawler.IO
             return lastVersions;
         }
 
+        public async Task<bool> AddValidateNodes( PackageId package, VPackageId node )
+        {
+            ValidateNodesEntity entity = new ValidateNodesEntity(package, node);
+            TableOperation insert = TableOperation.Insert(entity);
+            await ValidateNodesTable.ExecuteAsync( insert );
+
+            return true;
+        }
+
+        public async Task<bool> RemoveValidateNodes( PackageId package, VPackageId node )
+        {
+            TableOperation retrieve = TableOperation.Retrieve<ValidateNodesEntity>(package.Value, $"{node.Id}|{node.Version}");
+            TableResult tableResult = await ValidateNodesTable.ExecuteAsync(retrieve);
+            ValidateNodesEntity entity = (ValidateNodesEntity)tableResult.Result;
+
+            TableOperation delete = TableOperation.Delete(entity);
+            TableResult Tr = await ValidateNodesTable.ExecuteAsync( delete );
+            return true;
+        }
+            
+        public async Task<string> GetValidateNodes( PackageId package )
+        {
+            TableQuery<ValidateNodesEntity> rangeQuery = new TableQuery<ValidateNodesEntity>().Where(
+                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, package.Value)
+            );
+
+            List<ValidateNodesEntity> items = new List<ValidateNodesEntity>();
+            TableContinuationToken token = null;
+            do
+            {
+                TableQuerySegment<ValidateNodesEntity> seg = await ValidateNodesTable.ExecuteQuerySegmentedAsync(rangeQuery, token);
+                token = seg.ContinuationToken;
+                items.AddRange(seg);
+
+            } while( token != null);
+
+            List<VPackageId> listValidate = new List<VPackageId>();
+            foreach( ValidateNodesEntity entity in items )
+            {
+                string[] splitted = entity.RowKey.Split('|');
+                listValidate.Add( new VPackageId( "NuGet", splitted[0], splitted[1] ) );
+            }
+
+            return PackageSerializer.Serialize( listValidate );
+        }
+
         CloudStorageAccount _cloudStorageAccount;
         CloudStorageAccount CloudStorageAccount
         {
@@ -320,6 +371,12 @@ namespace Invenietis.DependencyCrawler.IO
         CloudTable VPackageTable
         {
             get { return _vPackageTable ?? (_vPackageTable = CloudTableClient.GetTableReference( _vPackageTableName )); }
+        }
+
+        CloudTable _validateNodesTable;
+        CloudTable ValidateNodesTable
+        {
+            get { return _validateNodesTable ?? (_validateNodesTable = CloudTableClient.GetTableReference( _validateNodesTableName )); }
         }
 
         CloudTable _notCrawledVPackageTable;
@@ -397,6 +454,19 @@ namespace Invenietis.DependencyCrawler.IO
             {
                 PartitionKey = vPackageId.PackageManager;
                 RowKey = $"{vPackageId.Id}|{vPackageId.Version}";
+            }
+        }
+
+        public class ValidateNodesEntity : TableEntity
+        {
+            public ValidateNodesEntity()
+            {
+            }
+
+            public ValidateNodesEntity(PackageId packageId, VPackageId node)
+            {
+                PartitionKey = packageId.Value;
+                RowKey = $"{node.Id}|{node.Version}";
             }
         }
     }

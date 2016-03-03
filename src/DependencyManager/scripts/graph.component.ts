@@ -15,8 +15,10 @@ declare var dagre: any
 export class GraphComponent implements OnInit {
 
     cyObj: any
-    Data: XMLDocument
+    xmlDependencies: XMLDocument
+    xmlLastVersions: XMLDocument
     public root: string
+    Exceptions: Element[] = [];
 
     constructor(private _routeParams: RouteParams, public http: Http) { }
 
@@ -26,7 +28,7 @@ export class GraphComponent implements OnInit {
         this.http.get('request/RootPackage/' + this.root)
             .toPromise()
             .then(data => {
-                this.Data = new DOMParser().parseFromString(data.text(), "text/xml");
+                this.xmlDependencies = new DOMParser().parseFromString(data.text(), "text/xml");
                 this.InitGraph(document.getElementsByClassName("cy")[0]);
             })
     }
@@ -67,8 +69,8 @@ export class GraphComponent implements OnInit {
                     })
                     .selector('.base')
                     .css({
-                        'width': '200px',
-                        'height': '200px',
+                        'width': '150px',
+                        'height': '150px',
                         'shape': 'rectangle'
                     })
                     .selector('.platform')
@@ -76,6 +78,34 @@ export class GraphComponent implements OnInit {
                         'width': '75px',
                         'height': '75px',
                         'shape': 'triangle'
+                    })
+                    .selector('.outDated')
+                    .css({
+                        'background-color': '#FF0000',
+                        'text-outline-color': '#FF0000',
+                        'line-color': '#FF0000',
+                        'target-arrow-color': '#FF0000'
+                    })
+                    .selector('.outDatedDepend')
+                    .css({
+                        'background-color': '#FF0000',
+                        'text-outline-color': '#FF0000',
+                        'line-color': '#FF0000',
+                        'target-arrow-color': '#FF0000'
+                    })
+                    .selector('.outDatedNotified')
+                    .css({
+                        'background-color': '#e89c03',
+                        'text-outline-color': '#FFA148',
+                    })
+                    .selector('.partialValidate')
+                    .css({
+                        'background-color': '#ffffff',
+                        'text-outline-color': '#ffffff',
+                    })
+                    .selector('.hide')
+                    .css({
+                        'display': 'none'
                     }),
 
                 // interaction options:
@@ -111,11 +141,11 @@ export class GraphComponent implements OnInit {
 
     LoadGraph() {
 
-        var racc = [this.Data.getElementsByTagName("VPackage")[0]
+        var racc = [this.xmlDependencies.getElementsByTagName("VPackage")[0]
             .getElementsByTagName("VPackageInfo")];
 
-        if (this.Data.getElementsByTagName("VPackage")[1] != undefined) {
-            racc.push(this.Data.getElementsByTagName("VPackage")[1]
+        if (this.xmlDependencies.getElementsByTagName("VPackage")[1] != undefined) {
+            racc.push(this.xmlDependencies.getElementsByTagName("VPackage")[1]
                 .getElementsByTagName("VPackageInfo"));
         }
 
@@ -124,6 +154,43 @@ export class GraphComponent implements OnInit {
         for (var j = 0; j < racc.length; j++) {
             var listVPack = [racc[j][0]];
             var listDep: Element[] = [];
+
+            if (this.cyObj.getElementById(listVPack[0].getAttribute('Id')).length == 0) {
+                this.cyObj.add({
+                    group: "nodes",
+                    data: {
+                        id: listVPack[0].getAttribute('Id'),
+                        name: listVPack[0].getAttribute("Id")
+                    },
+                    classes: "base initial"
+                });
+
+                var initial = this.cyObj.nodes().filter(function () {
+                    return this.hasClass('initial');
+                });
+
+                initial.on('click', e => {
+                    var actuallyHide = this.cyObj.elements().filter(function () {
+                        return this.hasClass('hide');
+                    });
+
+                    if (actuallyHide.length == 0) {
+                        var route = this.cyObj.elements().filter(function () {
+                            return this.hasClass('outDated');
+                        });
+
+                        if (route.length != 0) {
+                            var greenEle = this.cyObj.elements().filter(function () {
+                                return !this.hasClass('outDated') && !this.hasClass('outDatedDepend');
+                            });
+
+                            greenEle.addClass('hide');
+                        }
+                    } else {
+                        actuallyHide.removeClass('hide');
+                    }
+                });
+            }
 
             for (var i = 0; i < listVPack.length; i++) {
                 if (this.cyObj.getElementById(listVPack[i].getAttribute('Id') + listVPack[i].getAttribute('Version')).length == 0) {
@@ -134,6 +201,15 @@ export class GraphComponent implements OnInit {
                             name: listVPack[i].getAttribute("Id") + "\n" + listVPack[i].getAttribute('Version')
                         },
                         classes: "base"
+                    });
+
+                    this.cyObj.add({
+                        group: "edges",
+                        data: {
+                            id: listVPack[0].getAttribute('Id') + listVPack[i].getAttribute('Id') + listVPack[i].getAttribute('Version'),
+                            source: listVPack[0].getAttribute('Id'),
+                            target: listVPack[i].getAttribute('Id') + listVPack[i].getAttribute('Version')
+                        }
                     });
                 }
 
@@ -173,6 +249,7 @@ export class GraphComponent implements OnInit {
         }
 
         this.cyObj.layout(opt);
+
     }
 
     GraphAlgo(racc: Element, src: string) {
@@ -191,19 +268,28 @@ export class GraphComponent implements OnInit {
                             .getAttribute("Id").split('=')[1] + src
                     ).length == 0
                 ) {
+                    
+                    var infoId = racc.getElementsByTagName("Platform")[i]
+                        .getAttribute("Id").split(',')[0] +
+                        racc.getElementsByTagName("Platform")[i]
+                            .getAttribute("Id").split('=')[1] + src;
+
+                    var infoName = racc.getElementsByTagName("Platform")[i]
+                        .getAttribute("Id");
+
+                    if (infoName == "") {
+                        infoName = "All platforms";
+                    } else {
+                        infoName = infoName.split(',')[0] + "\n" +
+                            racc.getElementsByTagName("Platform")[i]
+                                .getAttribute("Id").split('=')[1];
+                    }
 
                     this.cyObj.add({
                         group: "nodes",
                         data: {
-                            id: racc.getElementsByTagName("Platform")[i]
-                                .getAttribute("Id").split(',')[0] +
-                            racc.getElementsByTagName("Platform")[i]
-                                .getAttribute("Id").split('=')[1] + src,
-
-                            name: racc.getElementsByTagName("Platform")[i]
-                                .getAttribute("Id").split(',')[0] + "\n" +
-                            racc.getElementsByTagName("Platform")[i]
-                                .getAttribute("Id").split('=')[1]
+                            id: infoId,
+                            name: infoName
                         },
                         classes: "platform"
                     });
@@ -248,6 +334,12 @@ export class GraphComponent implements OnInit {
                                 .getAttribute("Version")
                         ).length == 0
                     ) {
+                        var isRelease = "released";
+                        if (racc.getElementsByTagName("Platform")[i]
+                            .getElementsByTagName("Dependency")[j]
+                            .getAttribute("Version").includes("-")) {
+                            isRelease = "prereleased";
+                        }
 
                         this.cyObj.add({
                         group: "nodes",
@@ -263,10 +355,22 @@ export class GraphComponent implements OnInit {
                                 .getAttribute("Id") + "\nv" +
                             racc.getElementsByTagName("Platform")[i]
                                 .getElementsByTagName("Dependency")[j]
+                                .getAttribute("Version"),
+                            package: racc.getElementsByTagName("Platform")[i]
+                                .getElementsByTagName("Dependency")[j]
+                                .getAttribute("Id"),
+                            version: racc.getElementsByTagName("Platform")[i]
+                                .getElementsByTagName("Dependency")[j]
                                 .getAttribute("Version")
-                        }
+                        },
+                        classes: racc.getElementsByTagName("Platform")[i]
+                            .getElementsByTagName("Dependency")[j]
+                            .getAttribute("Id") + " " +
+                        racc.getElementsByTagName("Platform")[i]
+                            .getElementsByTagName("Dependency")[j]
+                            .getAttribute("Version") + " " + isRelease
+
                         });
-                    
                     }
 
                     if (
@@ -334,7 +438,7 @@ export class GraphComponent implements OnInit {
             }
         }
 
-        var racc = this.Data.getElementsByTagName("VPackage")[0]
+        var racc = this.xmlDependencies.getElementsByTagName("VPackage")[0]
             .getElementsByTagName("VPackageInfo");
 
         for (var i = 0; i < tempList.length; i++) {
@@ -370,6 +474,131 @@ export class GraphComponent implements OnInit {
         this.http.post('request/ListVersions/', JSON.stringify(newListDep), options)
             .toPromise()
             .then(data => {
+                this.xmlLastVersions = new DOMParser().parseFromString(data.text(), "text/xml");
             })
+            .then(x => {
+                var racc = this.xmlLastVersions;
+                this.cyObj.nodes()
+                    .filter(function () {
+                        return !this.hasClass("platform") && !this.hasClass("base");
+                    })
+                    .filter(function () {
+                        for (var j = 0; j < racc.getElementsByTagName('PackageLastVersion').length; j++) {
+                            if (this.hasClass(racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('Id')[0].childNodes[0].nodeValue)) {
+                                if (this.hasClass("released")) {
+                                    return !this.hasClass(racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('Release')[0].childNodes[0].nodeValue);
+                                } else if (this.hasClass("prereleased")) {
+                                    return !this.hasClass(racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('PreRelease')[0].childNodes[0].nodeValue);
+                                }
+                            }
+                        }
+                    })
+                    .addClass('outDated');
+            })
+            .then(y => {
+                let headers = new Headers({ 'Content-Type': 'application/json', 'Accept': 'text/xml' });
+                let options = new RequestOptions({ headers: headers });
+                let data = { "PackageManager": "Nuget", "Value": this.root };
+
+                this.http.post('request/GetValidateNodes/', JSON.stringify(data), options)
+                    .toPromise()
+                    .then(data => {
+                        var xmlValidateNodes = new DOMParser().parseFromString(data.text(), "text/xml");
+                        var ValidateNodes = xmlValidateNodes.getElementsByTagName('ValidateNode');
+                        for (var i = 0; i < ValidateNodes.length; i++) {
+
+                            var elmnt = this.cyObj.getElementById(ValidateNodes[i].getAttribute('Id') + ValidateNodes[i].getAttribute('Version'));
+                            this.Exceptions.push(elmnt);
+                            elmnt.removeClass('outDated');
+                            elmnt.addClass('outDatedNotified');
+                            this.cyObj.elements().removeClass('outDatedDepend');
+                        }
+
+                        this.ChangeAndToggle();
+                    })
+            });
+    }
+
+    ChangeAndToggle() {
+
+        var ElemtsOutDated = this.cyObj.elements().filter(function () {
+            return this.hasClass('outDated') || this.hasClass('outDatedNotified')
+        });
+
+        ElemtsOutDated.on('click', e => {
+            var elemts = this.cyObj.elements().filter(function () {
+                return this.hasClass('hide');
+            });
+
+            if (elemts.length == 0) {
+                let headers = new Headers({ 'Content-Type': 'application/json', 'Accept': 'text/xml' });
+                let options = new RequestOptions({ headers: headers });
+                var addOrRemove;
+
+                if (this.Exceptions.indexOf(e.cyTarget[0]) == -1) {
+
+                    this.Exceptions.push(e.cyTarget[0]);
+                    e.cyTarget[0].removeClass('outDated');
+                    e.cyTarget[0].addClass('outDatedNotified');
+                    this.cyObj.elements().removeClass('outDatedDepend');
+
+                    addOrRemove = "Add";
+                } else {
+
+                    e.cyTarget[0].removeClass('outDatedNotified');
+                    e.cyTarget[0].addClass('outDated');
+                    var idxEle = this.Exceptions.indexOf(e.cyTarget[0]);
+                    this.Exceptions.splice(idxEle, 1);
+
+                    addOrRemove = "Remove";
+                }
+
+                var data = { packageId: { "PackageManager": "Nuget", "Value": this.root }, vPackageId: { "PackageManager": "NuGet", "Id": e.cyTarget[0].data('package'), "Version": e.cyTarget[0].data('version') } };
+                this.http.post("request/" + addOrRemove + "ValidateNodes", JSON.stringify(data), options)
+                    .toPromise();
+
+                ChangeColor(this.cyObj, this.Exceptions);
+            }
+        })
+
+        ChangeColor(this.cyObj, this.Exceptions);
+
+        function ChangeColor(cyObj, Exce) {
+            var Elemnts = cyObj.elements().filter(function () {
+                if (Exce != []) {
+                    if (Exce.indexOf(this) == -1) {
+                        return this.hasClass('outDated');
+                    }
+                } else {
+                    return this.hasClass('outDated');
+                }
+            });
+
+            for (var i = 0; i < Elemnts.length; i++) {
+                Recursive(Elemnts[i].incomers());
+            }
+
+            function Recursive(list) {
+                list.addClass('outDatedDepend');
+                var tree = list.incomers();
+                if (tree.length != 0) {
+                    Recursive(tree);
+                }
+            }
+
+            var Package = cyObj.filter(function () {
+                return this.hasClass('initial');
+            })[0];
+
+            if (Package.hasClass('outDatedDepend') && Package.outgoers().nodes().length > 2) {
+                if (Package.outgoers().nodes()[0].hasClass('outDatedDepend') || Package.outgoers().nodes()[1].hasClass('outDatedDepend')) {
+                    Package.addClass('partialValidate');
+                } else {
+                    if (Package.hasClass('partialValidate')) {
+                        Package.removeClass('partialValidate')
+                    }
+                }
+            }
+        }
     }
 }

@@ -2,9 +2,21 @@
     <h1>Graph of : {{root}}</h1>
     <div class="container graph">
         <div class="btn-graph">
-            <button class="btn" [routerLink]="['Roots']">Retour</button>
+            <button class="btn" [routerLink]="['Roots']">Back</button>
         </div>
-        <div class="legend">
+        <div class="help">
+            ?
+        </div>
+        <div class="info" >
+            Rectangle: Package<br />
+            Triangle: Platform<br />
+            Circle: Dependency<br />
+            <br />
+            Click on :<br />
+            - Root, will hide functional part<br />
+            - Red dependency, will validate it<br />
+            - Orange dependency, will cancel validation
+        </div>
         <div class="cy load" #cy><img src="../Ressources/load.gif" /></div>
     </div>
 </div>

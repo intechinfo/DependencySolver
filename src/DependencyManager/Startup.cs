@@ -44,10 +44,11 @@ namespace DependencyManager
             string connectionString = config["Data:AzureStorage:ConnectionString"];
             string packageTable = config["Data:AzureStorage:PackageTable"];
             string vPackageTable = config["Data:AzureStorage:VPackageTable"];
+            string validateNodesTable = config["Data:AzureStorage:ValidateNodesTable"];
             string notCrawledVPackageTable = config["Data:AzureStorage:NotCrawledVPackageTable"];
             string vPackageCacheBlobContainer = config["Data:AzureStorage:VPackageCacheBlobContainer"];
 
-            services.AddTransient<IPackageRepository, AzureTablePackageRepository>(sp => new AzureTablePackageRepository(connectionString, packageTable, vPackageTable, notCrawledVPackageTable, vPackageCacheBlobContainer, TimeSpan.FromHours(10)));
+            services.AddTransient<IPackageRepository, AzureTablePackageRepository>(sp => new AzureTablePackageRepository(connectionString, packageTable, vPackageTable, validateNodesTable, notCrawledVPackageTable, vPackageCacheBlobContainer, TimeSpan.FromHours(10)));
 
             services.AddTransient<IPackageSerializer, XmlPackageSerializer>();
         }

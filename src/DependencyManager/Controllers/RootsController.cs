@@ -75,5 +75,23 @@ namespace DependencyManager.Controllers
                 LastVersions = kv.Value
             }).ToList();
         }
+
+        [HttpPost("AddValidateNodes")]
+        public async Task<bool> AddValidateNodes([FromBody] ValidateNode data)
+        {
+            return await _packRepo.AddValidateNodes( data.PackageId, data.VPackageId );
+        }
+
+        [HttpPost( "RemoveValidateNodes" )]
+        public async Task<bool> RemoveValidateNodes( [FromBody] ValidateNode data )
+        {
+            return await _packRepo.RemoveValidateNodes( data.PackageId, data.VPackageId );
+        }
+
+        [HttpPost("GetValidateNodes")]
+        public async Task<string> GetValidateNodes([FromBody] PackageId package )
+        {
+            return await _packRepo.GetValidateNodes( package );
+        }
     }
 }

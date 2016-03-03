@@ -152,5 +152,19 @@ namespace Invenietis.DependencyCrawler.IO
                 } )
                 .ToDictionary( x => x.Id, x => x.VPackageIds );
         }
+
+        public string Serialize(IEnumerable<VPackageId> nodes)
+        {
+            XElement xElement = new XElement("ValidateNodes",
+                nodes.Select(d => new XElement(
+                    "ValidateNode",
+                    new XAttribute("Id", d.Id),
+                    new XAttribute("Version", d.Version)
+                    )
+                 )
+            );
+
+            return xElement.ToString();
+        }
     }
 }
