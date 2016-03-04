@@ -22,6 +22,7 @@ export class GraphComponent implements OnInit {
 
     constructor(private _routeParams: RouteParams, public http: Http) { }
 
+    //Initiation of the graph component
     ngOnInit() {
         this.root = this._routeParams.get('name');
 
@@ -33,6 +34,7 @@ export class GraphComponent implements OnInit {
             })
     }
     
+    //Initiation of the graph object with options
     InitGraph(cy: Element) {
 
         if (typeof this.cyObj == 'undefined') {
@@ -139,6 +141,7 @@ export class GraphComponent implements OnInit {
         }
     }
 
+    //Load roots and necessary stuff for graph
     LoadGraph() {
 
         var racc = [this.xmlDependencies.getElementsByTagName("VPackage")[0]
@@ -252,6 +255,7 @@ export class GraphComponent implements OnInit {
 
     }
 
+    //Algo to link root with platforms and dependencies
     GraphAlgo(racc: Element, src: string) {
 
         //for on each platform
@@ -419,6 +423,7 @@ export class GraphComponent implements OnInit {
         return this.GetDep(racc.getElementsByTagName("Dependency"));
     }
 
+    //get list of given element without duplicates
     GetDep(listElmnt: NodeListOf<Element>) {
         var nbr = 0;
         var tempList: Element[] = [];
@@ -452,6 +457,7 @@ export class GraphComponent implements OnInit {
         return tempList;
     }
 
+    //Request versions and chechk each dependencies
     UpdateVersion(listDep: Element[]) {
         var newListDep = [];
 
@@ -519,6 +525,7 @@ export class GraphComponent implements OnInit {
             });
     }
 
+    //Manage stuffs
     ChangeAndToggle() {
 
         var ElemtsOutDated = this.cyObj.elements().filter(function () {
