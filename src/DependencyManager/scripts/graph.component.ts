@@ -492,9 +492,23 @@ export class GraphComponent implements OnInit {
                         for (var j = 0; j < racc.getElementsByTagName('PackageLastVersion').length; j++) {
                             if (this.hasClass(racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('Id')[0].childNodes[0].nodeValue)) {
                                 if (this.hasClass("released")) {
-                                    return !this.hasClass(racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('Release')[0].childNodes[0].nodeValue);
+                                    var newVersion = racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('Release')[0].childNodes[0].nodeValue;
+
+                                    if (!this.hasClass(newVersion)) {
+                                        var Name = this.data("name");
+                                        this.data("name", Name + "\n" + "(v" + newVersion + ")");
+
+                                        return this;
+                                    }
                                 } else if (this.hasClass("prereleased")) {
-                                    return !this.hasClass(racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('PreRelease')[0].childNodes[0].nodeValue);
+                                    var newVersion = racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('PreRelease')[0].childNodes[0].nodeValue;
+
+                                    if (!this.hasClass(newVersion)) {
+                                        var Name = this.data("name");
+                                        this.data("name", Name + "\n" + "(v" + newVersion + ")");
+
+                                        return !this.hasClass(newVersion);
+                                    }
                                 }
                             }
                         }

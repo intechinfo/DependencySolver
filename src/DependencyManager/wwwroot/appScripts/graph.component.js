@@ -28,6 +28,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                     this.http = http;
                     this.Exceptions = [];
                 }
+                //Initiation of the graph component
                 GraphComponent.prototype.ngOnInit = function () {
                     var _this = this;
                     this.root = this._routeParams.get('name');
@@ -38,6 +39,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                         _this.InitGraph(document.getElementsByClassName("cy")[0]);
                     });
                 };
+                //Initiation of the graph object with options
                 GraphComponent.prototype.InitGraph = function (cy) {
                     if (typeof this.cyObj == 'undefined') {
                         cy.textContent = "";
@@ -135,6 +137,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                         this.LoadGraph();
                     }
                 };
+                //Load roots and necessary stuff for graph
                 GraphComponent.prototype.LoadGraph = function () {
                     var _this = this;
                     var racc = [this.xmlDependencies.getElementsByTagName("VPackage")[0]
@@ -230,6 +233,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                     };
                     this.cyObj.layout(opt);
                 };
+                //Algo to link root with platforms and dependencies
                 GraphComponent.prototype.GraphAlgo = function (racc, src) {
                     //for on each platform
                     for (var i = 0; i < racc.getElementsByTagName("Platform").length; i++) {
@@ -365,6 +369,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                     }
                     return this.GetDep(racc.getElementsByTagName("Dependency"));
                 };
+                //get list of given element without duplicates
                 GraphComponent.prototype.GetDep = function (listElmnt) {
                     var nbr = 0;
                     var tempList = [];
@@ -392,6 +397,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                     }
                     return tempList;
                 };
+                //Request versions and chechk each dependencies
                 GraphComponent.prototype.UpdateVersion = function (listDep) {
                     var _this = this;
                     var newListDep = [];
@@ -423,10 +429,20 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                             for (var j = 0; j < racc.getElementsByTagName('PackageLastVersion').length; j++) {
                                 if (this.hasClass(racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('Id')[0].childNodes[0].nodeValue)) {
                                     if (this.hasClass("released")) {
-                                        return !this.hasClass(racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('Release')[0].childNodes[0].nodeValue);
+                                        var newVersion = racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('Release')[0].childNodes[0].nodeValue;
+                                        if (!this.hasClass(newVersion)) {
+                                            var Name = this.data("name");
+                                            this.data("name", Name + "\n" + "(" + newVersion + ")");
+                                            return this;
+                                        }
                                     }
                                     else if (this.hasClass("prereleased")) {
-                                        return !this.hasClass(racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('PreRelease')[0].childNodes[0].nodeValue);
+                                        var newVersion = racc.getElementsByTagName('PackageLastVersion')[j].getElementsByTagName('PreRelease')[0].childNodes[0].nodeValue;
+                                        if (!this.hasClass(newVersion)) {
+                                            var Name = this.data("name");
+                                            this.data("name", Name + "\n" + "(" + newVersion + ")");
+                                            return !this.hasClass(newVersion);
+                                        }
                                     }
                                 }
                             }
@@ -453,6 +469,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http'], function(
                         });
                     });
                 };
+                //Manage stuffs
                 GraphComponent.prototype.ChangeAndToggle = function () {
                     var _this = this;
                     var ElemtsOutDated = this.cyObj.elements().filter(function () {

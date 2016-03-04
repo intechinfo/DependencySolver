@@ -314,7 +314,7 @@ namespace Invenietis.DependencyCrawler.IO
 
         public async Task<bool> RemoveValidateNodes( PackageId package, VPackageId node )
         {
-            TableOperation retrieve = TableOperation.Retrieve<ValidateNodesEntity>(package.Value, $"{node.Id}|{node.Version}");
+            TableOperation retrieve = TableOperation.Retrieve<ValidateNodesEntity>($"{package.PackageManager}|{package.Value}", $"{node.Id}|{node.Version}");
             TableResult tableResult = await ValidateNodesTable.ExecuteAsync(retrieve);
             ValidateNodesEntity entity = (ValidateNodesEntity)tableResult.Result;
 
@@ -326,7 +326,7 @@ namespace Invenietis.DependencyCrawler.IO
         public async Task<string> GetValidateNodes( PackageId package )
         {
             TableQuery<ValidateNodesEntity> rangeQuery = new TableQuery<ValidateNodesEntity>().Where(
-                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, package.Value)
+                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, $"{package.PackageManager}|{package.Value}")
             );
 
             List<ValidateNodesEntity> items = new List<ValidateNodesEntity>();
@@ -343,7 +343,7 @@ namespace Invenietis.DependencyCrawler.IO
             foreach( ValidateNodesEntity entity in items )
             {
                 string[] splitted = entity.RowKey.Split('|');
-                listValidate.Add( new VPackageId( "NuGet", splitted[0], splitted[1] ) );
+                listValidate.Add( new VPackageId( package.PackageManager, splitted[0], splitted[1] ) );
             }
 
             return PackageSerializer.Serialize( listValidate );
@@ -465,7 +465,7 @@ namespace Invenietis.DependencyCrawler.IO
 
             public ValidateNodesEntity(PackageId packageId, VPackageId node)
             {
-                PartitionKey = packageId.Value;
+                PartitionKey = $"{packageId.PackageManager}|{packageId.Value}";
                 RowKey = $"{node.Id}|{node.Version}";
             }
         }
